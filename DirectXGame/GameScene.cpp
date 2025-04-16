@@ -3,7 +3,7 @@ using namespace KamataEngine;
 
 void GameScene::Initialize() 
 {
-	textureHandle_ = TextureManager::Load("white1x1.png");
+	textureHandle_ = TextureManager::Load("rumia.jpg");
 	model_ = Model::Create();
 	worldTransform_.Initialize();
 	camera_.Initialize();
