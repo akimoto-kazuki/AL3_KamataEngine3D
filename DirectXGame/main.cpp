@@ -8,15 +8,15 @@ using namespace KamataEngine;
 int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
-	GameScene* gameScene = new GameScene();
 	//エンジンの初期化
 	KamataEngine::Initialize(L"LE2D_03_アキモト_カズキ_AL3");
+	GameScene* gameScene = new GameScene();
 	//GameSceneの初期化
 	gameScene->Initialize();
 	//ゲームシーンの解放
-	delete gameScene;
+	
 	// nullptrの代入
-	gameScene = nullptr;
+	//gameScene = nullptr;
 
 	//メインループ
 	while (true) 
@@ -39,6 +39,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		//描画終了
 		dxCommon->PostDraw();
 	}
+	delete gameScene;
 	//エンジンの終了処理
 	KamataEngine::Finalize();
 
