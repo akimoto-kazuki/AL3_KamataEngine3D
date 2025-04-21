@@ -11,7 +11,7 @@ class GameScene
 	KamataEngine::Camera camera_;
 	Player* player_ = nullptr;
 
-	std::vector <KamataEngine::WorldTransform* > worldTransformBlocks_;
+	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 
 private:
 	uint32_t textureHandle_ = 0;

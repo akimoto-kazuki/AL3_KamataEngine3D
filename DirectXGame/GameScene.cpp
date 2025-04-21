@@ -15,26 +15,52 @@ void GameScene::Initialize()
 
 	// ブロック
 	modelBlock_ = Model::CreateFromOBJ("cube");
+	const uint32_t kNumBlockVirtical = 10;
 	const uint32_t kNumBlockHorizontal = 20;
-	const float kBlockWidth = 2.0f;
-	worldTransformBlocks_.resize(kNumBlockHorizontal);
 
-	for (uint32_t i = 0; i < kNumBlockHorizontal; ++i) 
+	const float kBlockWidth = 2.0f;
+	const float kBlockHeight = 2.0f;
+
+	worldTransformBlocks_.resize(kNumBlockVirtical);
+
+	for (uint32_t i = 0; i < kNumBlockVirtical; ++i) 
 	{
-		worldTransformBlocks_[i] = new WorldTransform();
+		worldTransformBlocks_[i].resize(kNumBlockHorizontal);
+		/*worldTransformBlocks_[i] = new WorldTransform();
 		worldTransformBlocks_[i]->Initialize();
 		worldTransformBlocks_[i]->translation_.x = kBlockWidth * i;
-		worldTransformBlocks_[i]->translation_.y = 0.0f;
+		worldTransformBlocks_[i]->translation_.y = 0.0f;*/
 	}
+	for (uint32_t i = 0; i < kNumBlockVirtical; ++i) 
+	{
+		for (uint32_t j = 0; j < kNumBlockHorizontal; ++j)
+		{
+			/*if (j % 2 == 0) 
+			{
+				continue;
+			}*/
+			if ((i + j) % 2 == 0) 
+			{
+				continue;
+			}
+			worldTransformBlocks_[i][j] = new WorldTransform();
+			worldTransformBlocks_[i][j]->Initialize();
+			worldTransformBlocks_[i][j]->translation_.x = kBlockWidth * j;
+			worldTransformBlocks_[i][j]->translation_.y = kBlockHeight * i;
+		}
+	}
+
 }
 
 GameScene::~GameScene() 
 {
 	delete model_;
 	delete player_;
-	for (WorldTransform* worldTransformBlock: worldTransformBlocks_ ) 
+	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine:worldTransformBlocks_) 
 	{
-		delete worldTransformBlock;
+		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+			delete worldTransformBlock;
+		}
 	}
 	worldTransformBlocks_.clear();
 }
@@ -42,12 +68,24 @@ GameScene::~GameScene()
 void GameScene::Update() 
 {
 	player_->Update();
-	for (WorldTransform* worldTransformBlock : worldTransformBlocks_) 
+	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_)
+	{
+		for (WorldTransform* worldTransformBlock : worldTransformBlockLine)
+		{
+			if (!worldTransformBlock) 
+			{
+				continue;
+			}
+			worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
+			worldTransformBlock->TransferMatrix();
+		}
+	}
+	/*for (WorldTransform* worldTransformBlock : worldTransformBlocks_) 
 	{
 		worldTransformBlock->matWorld_ = 
 			MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
 		worldTransformBlock->TransferMatrix();
-	}
+	}*/
 	
 }
 
@@ -56,9 +94,17 @@ void GameScene::Draw()
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	Model::PreDraw(dxCommon->GetCommandList());
 	player_->Draw();
-	for (WorldTransform* worldTransformBlock : worldTransformBlocks_) {
-		modelBlock_->Draw(*worldTransformBlock, camera_);
+	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+			if (!worldTransformBlock) {
+				continue;
+			}
+			modelBlock_->Draw(*worldTransformBlock, camera_);
+		}
 	}
+	/*for (WorldTransform* worldTransformBlock : worldTransformBlocks_) {
+		modelBlock_->Draw(*worldTransformBlock, camera_);
+	}*/
 	Model::PostDraw();
 
 	
