@@ -50,6 +50,9 @@ void GameScene::Initialize()
 		}
 	}
 
+	//デバッグ
+	debugCamera_ = new DebugCamera(1280, 720);
+
 }
 
 GameScene::~GameScene() 
@@ -63,6 +66,7 @@ GameScene::~GameScene()
 		}
 	}
 	worldTransformBlocks_.clear();
+	delete debugCamera_;
 }
 
 void GameScene::Update() 
@@ -80,6 +84,31 @@ void GameScene::Update()
 			worldTransformBlock->TransferMatrix();
 		}
 	}
+	debugCamera_->Update();
+
+#ifdef _DEBUG
+
+	if (Input::GetInstance()->TriggerKey(DIK_0)) 
+	{
+		isDebugCameraActive_ = !isDebugCameraActive_;
+	}
+
+#endif // DEBUG
+
+	if (isDebugCameraActive_) 
+	{
+		debugCamera_->Update();
+		camera_.matView = debugCamera_->GetCamera().matView;
+		camera_.matProjection = debugCamera_->GetCamera().matProjection;
+		camera_.TransferMatrix();
+	} 
+	else 
+	{
+		camera_.UpdateMatrix();
+	}
+
+
+
 	/*for (WorldTransform* worldTransformBlock : worldTransformBlocks_) 
 	{
 		worldTransformBlock->matWorld_ = 
@@ -93,7 +122,7 @@ void GameScene::Draw()
 {
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	Model::PreDraw(dxCommon->GetCommandList());
-	player_->Draw();
+	//player_->Draw();
 	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			if (!worldTransformBlock) {
