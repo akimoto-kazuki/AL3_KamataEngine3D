@@ -13,9 +13,16 @@ class GameScene
 
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 
+
+
+
 private:
+
 	uint32_t textureHandle_ = 0;
 	KamataEngine::Model* modelBlock_;
+	KamataEngine::DebugCamera* debugCamera_ = nullptr;
+	bool isDebugCameraActive_ = false;
+
 
 public:
 	//初期化
