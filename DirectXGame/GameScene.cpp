@@ -8,10 +8,13 @@ void GameScene::Initialize()
 	textureHandle_ = TextureManager::Load("202.png"); 
 	model_ = Model::Create();
 	camera_.Initialize();
+
+	modelPlayer_ = Model::CreateFromOBJ("player", true);
+
 	//自キャラの生成
 	player_ = new Player();
 	//自キャラの初期化
-	player_->Initialize(model_,textureHandle_,&camera_);
+	player_->Initialize(modelPlayer_,&camera_);
 
 	
 
@@ -22,7 +25,7 @@ void GameScene::Initialize()
 	skydome_->Initialize(modelSkydome_, &camera_);
 
 	// ブロック
-	modelBlock_ = Model::CreateFromOBJ("cube");
+	modelBlock_ = Model::CreateFromOBJ("block",true);
 	const uint32_t kNumBlockVirtical = 10;
 	const uint32_t kNumBlockHorizontal = 20;
 
@@ -47,7 +50,7 @@ void GameScene::Initialize()
 			{
 				continue;
 			}*/
-			if ((i + j) % 2 == 1) 
+			if ((i + j) % 2 == 0) 
 			{
 				continue;
 			}
@@ -132,7 +135,7 @@ void GameScene::Draw()
 {
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	Model::PreDraw(dxCommon->GetCommandList());
-	//player_->Draw();
+	player_->Draw();
 	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			if (!worldTransformBlock) {
