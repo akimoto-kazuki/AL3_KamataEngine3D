@@ -13,6 +13,14 @@ void GameScene::Initialize()
 	//自キャラの初期化
 	player_->Initialize(model_,textureHandle_,&camera_);
 
+	
+
+	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
+
+	skydome_ = new Skydome();
+
+	skydome_->Initialize(modelSkydome_, &camera_);
+
 	// ブロック
 	modelBlock_ = Model::CreateFromOBJ("cube");
 	const uint32_t kNumBlockVirtical = 10;
@@ -39,7 +47,7 @@ void GameScene::Initialize()
 			{
 				continue;
 			}*/
-			if ((i + j) % 2 == 0) 
+			if ((i + j) % 2 == 1) 
 			{
 				continue;
 			}
@@ -67,11 +75,13 @@ GameScene::~GameScene()
 	}
 	worldTransformBlocks_.clear();
 	delete debugCamera_;
+	delete modelSkydome_;
 }
 
 void GameScene::Update() 
 {
 	player_->Update();
+	skydome_->Update();
 	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_)
 	{
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine)
@@ -131,10 +141,11 @@ void GameScene::Draw()
 			modelBlock_->Draw(*worldTransformBlock, camera_);
 		}
 	}
+	skydome_->Draw();
 	/*for (WorldTransform* worldTransformBlock : worldTransformBlocks_) {
 		modelBlock_->Draw(*worldTransformBlock, camera_);
 	}*/
 	Model::PostDraw();
-
+	
 	
 }
