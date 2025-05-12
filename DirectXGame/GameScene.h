@@ -16,6 +16,8 @@ class GameScene
 
 	KamataEngine::Model* modelSkydome_ = nullptr;
 
+	KamataEngine::Model* modelPlayer_ = nullptr;
+
 	Skydome* skydome_ = nullptr;
 
 
