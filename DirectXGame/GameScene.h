@@ -2,6 +2,7 @@
 #include "KamataEngine.h"
 #include "Player.h"
 #include "Skydome.h"
+#include "MapChipField.h"
 #include <vector>
 
 class GameScene 
@@ -20,6 +21,8 @@ class GameScene
 
 	Skydome* skydome_ = nullptr;
 
+	MapChipField* mapChipField_;
+	void GenerateBlocks();
 
 private:
 
