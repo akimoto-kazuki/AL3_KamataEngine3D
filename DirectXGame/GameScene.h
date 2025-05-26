@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Skydome.h"
 #include "MapChipField.h"
+#include "CameraController.h"
 #include <vector>
 
 class GameScene 
@@ -12,6 +13,8 @@ class GameScene
 	
 	KamataEngine::Camera camera_;
 	Player* player_ = nullptr;
+
+	CameraController*cameraController_ = nullptr;
 
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 
