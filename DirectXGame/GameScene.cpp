@@ -25,7 +25,16 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 
-	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(1, 18);
+	// カメラ
+	cameraController_ = new CameraController();
+	cameraController_->Initialize();
+	cameraController_->SetTarget(player_);
+	cameraController_->Reset();
+	CameraController::Rect cameraArea = {12.0f, (100 - 12.0f), 6.0f, 6.0f};
+	cameraController_->SetMovableArea(cameraArea);
+	
+
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
 	// 自キャラの初期化
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 
@@ -34,7 +43,6 @@ void GameScene::Initialize() {
 
 	//デバッグ
 	debugCamera_ = new DebugCamera(1280, 720);
-
 }
 
 void GameScene::GenerateBlocks() {
@@ -73,12 +81,14 @@ GameScene::~GameScene()
 	delete debugCamera_;
 	delete modelSkydome_;
 	delete mapChipField_;
+	delete cameraController_;
 }
 
 void GameScene::Update() 
 {
 	player_->Update();
 	skydome_->Update();
+	cameraController_->Update();
 	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_)
 	{
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine)
@@ -111,7 +121,9 @@ void GameScene::Update()
 	} 
 	else 
 	{
-		camera_.UpdateMatrix();
+		camera_.matView = cameraController_->GetViewProjection().matView;
+		camera_.matProjection = cameraController_->GetViewProjection().matProjection;
+		camera_.TransferMatrix();
 	}
 
 

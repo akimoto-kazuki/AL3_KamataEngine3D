@@ -12,6 +12,9 @@ class Player
 	};
 
 private:
+
+
+
 	KamataEngine::WorldTransform worldTransform_;
 	KamataEngine::Model* model_ = nullptr;
 	KamataEngine::Camera* camera_ = nullptr;
@@ -56,4 +59,9 @@ public:
 	void Update();
 	//描画
 	void Draw();
+
+	const KamataEngine::WorldTransform& GetWorldTransform() const { return worldTransform_; }
+
+	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
+
 };
