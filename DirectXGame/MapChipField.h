@@ -11,8 +11,11 @@ struct MapChipData {
 	std::vector<std::vector<MapChipType>> data;
 };
 
+
 class MapChipField 
 {
+	
+	
 	static inline const float kBlockWidth = 1.0f;
 	static inline const float kBlockHeight = 1.0f;
 
@@ -20,6 +23,20 @@ class MapChipField
 	static inline const uint32_t kNumBlockHorizontal = 100;
 
 public:
+
+	struct IndexSet
+	{
+		uint32_t xIndex;
+		uint32_t yIndex;
+	};
+
+	struct Rect 
+	{
+		float left;
+		float right;
+		float bottom;
+		float top;
+	};
 
 	void ResetMapChipData();
 
@@ -34,6 +51,10 @@ public:
 	MapChipType GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex);
 
 	KamataEngine::Vector3 GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex);
+
+	IndexSet GetMapChipByIndexSetPosition(const KamataEngine::Vector3& position);
+
+	Rect GetRectByIndex(uint32_t xIndex, uint32_t yIndex);
 
 };
 

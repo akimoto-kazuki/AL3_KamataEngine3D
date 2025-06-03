@@ -13,11 +13,6 @@ class Player;
 class CameraController
 {
 
-	
-	
-	
-	
-
 public:
 
 	struct Rect {
