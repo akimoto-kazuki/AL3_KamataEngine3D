@@ -190,12 +190,12 @@ void Player::MapHitCheckUP(CollisionMapInfo& info)
 	{
 		hit = true;
 	}
-	/*indexSet = mapChipField_->GetMapChipByIndexSetPosition(positionsNew[kRightTop]);
+	indexSet = mapChipField_->GetMapChipByIndexSetPosition(positionsNew[kRightTop]);
 	mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
 	if (mapChipType == MapChipType::kBlock)
 	{
 		hit = true;
-	}*/
+	}
 	if (hit) 
 	{
 		// めり込みを排除する方向に移動量を設定する
