@@ -35,7 +35,7 @@ namespace
         return KamataEngine::Vector3(kBlockWidth * xIndex,kBlockHeight * (kNumBlockVirtical - 1 - yIndex),0); 
     }
 
-    MapChipField::IndexSet MapChipField::GetMapChipByIndexSetPosition(const KamataEngine::Vector3& position) 
+    MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const KamataEngine::Vector3& position) 
     {
 	    IndexSet indexSet = {};
 	    indexSet.xIndex = static_cast<uint32_t>((position.x + kBlockWidth / 2) / kBlockWidth);

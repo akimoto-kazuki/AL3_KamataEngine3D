@@ -76,6 +76,8 @@ private:
 	// キャラクターの当たり判定サイズ
 	static inline const float kWidth = 0.8f;
 	static inline const float kHeight = 0.8f;
+	static inline const float kAttenuationLanding = 0.8f;
+	static inline const float kGroundSearchHeight = 0.8f;
 
 public:
 
@@ -87,25 +89,29 @@ public:
 	void Update();
 	//描画
 	void Draw();
-	// 移動入力
+	// 1 移動入力
 	void InputMove();
-	// 旋回制御
+	// 2 移動量を加味して衝突判定する
+	// 上方向
+	void MapHitCheckUP(CollisionMapInfo& info);
+	// 下方向
+	void MapHitCheckDown(CollisionMapInfo& info);
+	// 右方向
+	// void MapHitCheckRight(CollisionMapInfo& info);
+	// 左方向
+	// void MapHitCheckLeft(CollisionMapInfo& info);
+	// 3 判定結果を反映して移動させる
+	void MapHitMove(const CollisionMapInfo& info);
+	// 4 天井に接触している場合の処理
+	void CheckMapCeiling(const CollisionMapInfo& info);
+	// 6 接地状態の切り替え
+	void CheckMapLanding(const CollisionMapInfo& info);
+	// 7 旋回制御
 	void AnimateTurn();
 	// マップ衝突チェック
 	void MapHitCheck(CollisionMapInfo& info);
-	//上方向
-	void MapHitCheckUP(CollisionMapInfo& info);
-	//下方向
-	//void MapHitCheckDown(CollisionMapInfo& info);
-	//右方向
-	//void MapHitCheckRight(CollisionMapInfo& info);
-	//左方向
-	//void MapHitCheckLeft(CollisionMapInfo& info);
-	// 判定結果を反映して移動させる
-	void MapHitMove(const CollisionMapInfo& info);
-	// 天井に接触している場合の処理
-	void CheckMapCeiling(const CollisionMapInfo& info);
-
+	
+	
 	KamataEngine::Vector3 CornerPosition(const KamataEngine::Vector3& center, Corner corner);
 
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
