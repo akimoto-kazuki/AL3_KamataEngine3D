@@ -44,7 +44,7 @@ void Player::Update() {
 	// 5 壁
 
 	// 6 着地
-	//CheckMapLanding(collisionMapInfo);
+	CheckMapLanding(collisionMapInfo);
 
 	AnimateTurn();
 
@@ -248,6 +248,8 @@ void Player::CheckMapLanding(const CollisionMapInfo& info)
 	if (onGround_)
 	{
 		// 接地状態
+
+		// ジャンプの処理
 		if (velocity_.y > 0.0f) 
 		{
 			onGround_ = false;
