@@ -55,7 +55,7 @@ namespace
 	    rect.bottom = center.y - kBlockHeight / 2.0f;
 	    rect.top = center.y + kBlockHeight / 2.0f;
 
-        return Rect();
+        return rect;
     }
 
     void MapChipField::ResetMapChipData() 
