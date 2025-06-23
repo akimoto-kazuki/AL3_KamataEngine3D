@@ -42,7 +42,6 @@ void Player::Update() {
 	CheckMapCeiling(collisionMapInfo);
 
 	// 5 壁
-	HitWall(collisionMapInfo);
 
 	// 6 着地
 	CheckMapLanding(collisionMapInfo);
@@ -337,6 +336,7 @@ void Player::MapHitCheckLeft(CollisionMapInfo& info)
 	}
 }
 
+
 // 3 判定結果を反映して移動させる
 void Player::MapHitMove(const CollisionMapInfo& info)
 {
@@ -351,15 +351,6 @@ void Player::CheckMapCeiling(const CollisionMapInfo& info)
 	{
 		DebugText::GetInstance()->ConsolePrintf("hit ceiling\n");
 		velocity_.y = 0;
-	}
-}
-
-// 5
-void Player::HitWall(const CollisionMapInfo& info) 
-{
-	if (info.hitWall)
-	{
-		velocity_.x *= (1.0f - kAttenuationWall);
 	}
 }
 
@@ -449,8 +440,6 @@ void Player::MapHitCheck(CollisionMapInfo& info)
 {
 	MapHitCheckUP(info); 
 	MapHitCheckDown(info);
-	MapHitCheckRight(info);
-	MapHitCheckLeft(info);
 }
 
 
