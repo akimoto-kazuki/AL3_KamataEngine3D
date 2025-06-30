@@ -77,6 +77,7 @@ private:
 	static inline const float kWidth = 0.8f;
 	static inline const float kHeight = 0.8f;
 	static inline const float kAttenuationLanding = 0.0001f;
+	static inline const float kAttenuationWall = 0.0001f;
 	static inline const float kGroundSearchHeight = 0.1f;
 
 public:
@@ -105,7 +106,7 @@ public:
 	// 4 天井に接触している場合の処理
 	void CheckMapCeiling(const CollisionMapInfo& info);
 	// 5
-	//void HitWall(const CollisionMapInfo& info);
+	void HitWall(const CollisionMapInfo& info);
 	// 6 接地状態の切り替え
 	void CheckMapLanding(const CollisionMapInfo& info);
 	// 7 旋回制御

@@ -42,7 +42,7 @@ void Player::Update() {
 	CheckMapCeiling(collisionMapInfo);
 
 	// 5 壁
-
+	HitWall(collisionMapInfo);
 	// 6 着地
 	CheckMapLanding(collisionMapInfo);
 
@@ -354,6 +354,12 @@ void Player::CheckMapCeiling(const CollisionMapInfo& info)
 	}
 }
 
+void Player::HitWall(const CollisionMapInfo& info) {
+	if (info.hitWall) {
+		velocity_.x *= (1.0f - kAttenuationWall);
+	}
+}
+
 // 6 接地状態の切り替え
 void Player::CheckMapLanding(const CollisionMapInfo& info)
 {
@@ -440,6 +446,8 @@ void Player::MapHitCheck(CollisionMapInfo& info)
 {
 	MapHitCheckUP(info); 
 	MapHitCheckDown(info);
+	MapHitCheckRight(info);
+	MapHitCheckLeft(info);
 }
 
 
