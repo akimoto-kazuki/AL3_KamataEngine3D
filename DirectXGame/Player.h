@@ -97,9 +97,9 @@ public:
 	// 下方向
 	void MapHitCheckDown(CollisionMapInfo& info);
 	// 右方向
-	//void MapHitCheckRight(CollisionMapInfo& info);
+	void MapHitCheckRight(CollisionMapInfo& info);
 	// 左方向
-	//void MapHitCheckLeft(CollisionMapInfo& info);
+	void MapHitCheckLeft(CollisionMapInfo& info);
 	// 3 判定結果を反映して移動させる
 	void MapHitMove(const CollisionMapInfo& info);
 	// 4 天井に接触している場合の処理
