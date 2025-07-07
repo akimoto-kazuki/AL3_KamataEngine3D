@@ -10,38 +10,38 @@
 using namespace KamataEngine;
 using namespace MathUtility;
 
-void Enemy::Initialize(KamataEngine::Model* model, KamataEngine::Vector3& position)
+void Enemy::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position)
 {
 	assert(model);
 	model_ = model;
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
-	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	worldTransform_.rotation_.y = std::numbers::pi_v<float> / -2.0f;
+	camera_ = camera;
+	velocity_ = {-kWalkSpeed, 0, 0};
+	walkTimer_ = 0.0f;
+}
+
+void Enemy::Update() 
+{
+
+	worldTransform_.translation_ += velocity_;
+
+	walkTimer_ += 1.0f / 20.0f;
+
+	// 回転アニメーション
+	worldTransform_.rotation_.x = std::sin(walkTimer_);
+
+	/*float param = std::sin(walkTimer_);
+	float degree = kWalkMotionAngleStart + kWalkMotionAngleEnd * (param + 1.0f) / 2.0f;
+	worldTransform_.rotation_.x = std::*/
+
+	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+	worldTransform_.TransferMatrix();
 	
 }
 
-void Enemy::Update()
+void Enemy::Draw() 
 {
-	std::array<Vector3, kNumCenter> positionsNew;
-	// 移動後の４つ角の座標
-	for (uint32_t i = 0; i < positionsNew.size(); ++i) {
-		positionsNew[i] = CornerPosition(worldTransform_.translation_ , static_cast<Corner>(i));
-	}
-}
-
-void Enemy::Draw()
-{
-	model_->Draw(worldTransform_, *camera_); 
-}
-
-KamataEngine::Vector3 Enemy::CornerPosition(const KamataEngine::Vector3& center, Corner corner) 
-{
-	Vector3 offsetTable[kNumCenter] = {
-	    {+kWidth / 2.0f, -kHeight / 2.0f, 0},
-        {-kWidth / 2.0f, -kHeight / 2.0f, 0},
-        {+kWidth / 2.0f, +kHeight / 2.0f, 0},
-        {-kWidth / 2.0f, +kHeight / 2.0f, 0}
-    };
-
-	return center + offsetTable[static_cast<uint32_t>(corner)];
+	model_->Draw(worldTransform_, *camera_);
 }
