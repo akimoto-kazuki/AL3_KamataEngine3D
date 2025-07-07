@@ -12,6 +12,8 @@ void GameScene::Initialize() {
 
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
 
+	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
+
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
 	skydome_ = new Skydome();
@@ -25,6 +27,8 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 
+	enemy_ = new Enemy();
+
 	// カメラ
 	cameraController_ = new CameraController();
 	cameraController_->Initialize();
@@ -36,9 +40,13 @@ void GameScene::Initialize() {
 	
 
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
+
+	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(18, 18);
+
 	// 自キャラの初期化
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 
+	enemy_->Initialize(modelEnemy_, &camera_, enemyPosition);
 
 	player_->SetMapChipField(mapChipField_);
 	// ブロック
@@ -74,6 +82,7 @@ GameScene::~GameScene()
 {
 	delete model_;
 	delete player_;
+	delete enemy_;
 	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine:worldTransformBlocks_) 
 	{
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
@@ -90,6 +99,7 @@ GameScene::~GameScene()
 void GameScene::Update() 
 {
 	player_->Update();
+	enemy_->Update();
 	skydome_->Update();
 	cameraController_->Update();
 	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_)
@@ -145,6 +155,7 @@ void GameScene::Draw()
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	Model::PreDraw(dxCommon->GetCommandList());
 	player_->Draw();
+	enemy_->Draw();
 	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			if (!worldTransformBlock) {

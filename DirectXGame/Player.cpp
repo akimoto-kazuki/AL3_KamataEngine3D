@@ -25,7 +25,6 @@ void Player::Update() {
 
 	// 1 移動入力
 	InputMove();
-
 	// 2 移動量を加味して衝突判定
 	// 衝突情報の初期化
 	CollisionMapInfo collisionMapInfo;
@@ -35,46 +34,17 @@ void Player::Update() {
 	MapHitCheck(collisionMapInfo);
 	// 3 マップ衝突チェック
 	MapHitMove(collisionMapInfo);
-	//worldTransform_.translation_ += velocity_;
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
 	// 4 天井
 	CheckMapCeiling(collisionMapInfo);
-
 	// 5 壁
 	HitWall(collisionMapInfo);
 	// 6 着地
 	CheckMapLanding(collisionMapInfo);
-
+	// 回転アニメーション
 	AnimateTurn();
 
-	//bool landing = false;
-
-	//if (velocity_.y < 0) 
-	//{
-	//	if (worldTransform_.translation_.y <= 1.0f) {
-	//		landing = true;
-	//	}
-	//}
-
-	//if (onGround_) 
-	//{
-	//	if (velocity_.y > 0.0f) {
-	//		onGround_ = false;
-	//	}
-	//} 
-	//else 
-	//{
-	//	if (landing)
-	//	{
-	//		// めり込み
-	//		worldTransform_.translation_.y = 1.0f;
-	//		// 摩擦
-	//		velocity_.x *= (1.0f - kAttenuation);
-	//		velocity_.y = 0.0f;
-	//		onGround_ = true;
-	//	}
-	//}
 }
 
 void Player::InputMove() 
@@ -286,8 +256,7 @@ void Player::MapHitCheckRight(CollisionMapInfo& info)
 			MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
 			info.move.x = std::max(0.0f, rect.left - worldTransform_.translation_.x - (kWidth / 2.0f + kBlank));
 			// 壁に当たったことを記録する
-			info.hitWall = true;
-		
+		    info.hitWall = true;
 	}
 
 }
@@ -332,10 +301,8 @@ void Player::MapHitCheckLeft(CollisionMapInfo& info)
 		info.move.x = std::min(0.0f, rect.right - worldTransform_.translation_.x + (kWidth / 2.0f + kBlank));
 		// 地面に当たったことを記録する
 		info.hitWall = true;
-		
 	}
 }
-
 
 // 3 判定結果を反映して移動させる
 void Player::MapHitMove(const CollisionMapInfo& info)
@@ -439,8 +406,6 @@ KamataEngine::Vector3 Player::CornerPosition(const KamataEngine::Vector3& center
 	
 	return center + offsetTable[static_cast<uint32_t>(corner)];
 }
-
-
 
 void Player::MapHitCheck(CollisionMapInfo& info) 
 {

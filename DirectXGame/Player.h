@@ -82,8 +82,6 @@ private:
 
 public:
 
-	
-
 	//初期化
 	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera,KamataEngine::Vector3& position);
 	//更新
@@ -114,7 +112,7 @@ public:
 	// マップ衝突チェック
 	void MapHitCheck(CollisionMapInfo& info);
 	
-	
+
 	KamataEngine::Vector3 CornerPosition(const KamataEngine::Vector3& center, Corner corner);
 
 	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
