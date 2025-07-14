@@ -1,8 +1,12 @@
 #pragma once
 #include "KamataEngine.h"
+#include "MyMath.h"
+
 #include <vector>
 
 class MapChipField;
+
+class Enemy;
 
 //自キャラ
 class Player 
@@ -33,6 +37,7 @@ private:
 		bool hitWall = false; // 壁衝突フラグ
 		KamataEngine::Vector3 move;         // 移動量
 	};
+
 
 	KamataEngine::WorldTransform worldTransform_;
 	KamataEngine::Model* model_ = nullptr;
@@ -120,5 +125,11 @@ public:
 	const KamataEngine::WorldTransform& GetWorldTransform() const { return worldTransform_; }
 
 	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
+
+	KamataEngine::Vector3 GetWorldPosition();
+
+	AABB GetAABB();
+
+	void OnCollision(const Enemy* enemy);
 
 };

@@ -102,6 +102,7 @@ void Player::InputMove()
 	}
 }
 
+// アニメーション回転
 void Player::AnimateTurn() 
 {
 	if (turnTimer_ > 0.0f) {
@@ -116,6 +117,7 @@ void Player::AnimateTurn()
 }
 
 // 2 移動量を加味して衝突判定する
+
 // 上方向
 void Player::MapHitCheckUP(CollisionMapInfo& info) {
 	// 上昇アリ？
@@ -321,6 +323,7 @@ void Player::CheckMapCeiling(const CollisionMapInfo& info)
 	}
 }
 
+// 5 壁の当たり判定
 void Player::HitWall(const CollisionMapInfo& info) {
 	if (info.hitWall) {
 		velocity_.x *= (1.0f - kAttenuationWall);
@@ -407,6 +410,36 @@ KamataEngine::Vector3 Player::CornerPosition(const KamataEngine::Vector3& center
 	return center + offsetTable[static_cast<uint32_t>(corner)];
 }
 
+KamataEngine::Vector3 Player::GetWorldPosition() 
+{
+	// ワールド座標を入れる変数
+	KamataEngine::Vector3 worldPos;
+	// ワールド行列の平行移動成分取得
+	worldPos.x = worldTransform_.matWorld_.m[3][0];
+	worldPos.y = worldTransform_.matWorld_.m[3][1];
+	worldPos.z = worldTransform_.matWorld_.m[3][2];
+
+	return worldPos; 
+}
+
+AABB Player::GetAABB() 
+{
+	KamataEngine::Vector3 worldPos = GetWorldPosition();
+	
+	AABB aabb;
+
+	aabb.min = {(worldPos.x - 0.5f) / 2.0f, (worldPos.y - 0.5f) / 2.0f, (worldPos.z - 0.5f) / 2.0f};
+	aabb.max = {(worldPos.x + 0.5f) / 2.0f, (worldPos.y + 0.5f) / 2.0f, (worldPos.z + 0.5f) / 2.0f};
+
+	return aabb;
+
+}
+
+void Player::OnCollision(const Enemy* enemy)
+{ 
+	(void)enemy;
+}
+
 void Player::MapHitCheck(CollisionMapInfo& info) 
 {
 	MapHitCheckUP(info); 
@@ -414,8 +447,6 @@ void Player::MapHitCheck(CollisionMapInfo& info)
 	MapHitCheckRight(info);
 	MapHitCheckLeft(info);
 }
-
-
 
 void Player::Draw() 
 {
