@@ -15,7 +15,9 @@ class GameScene
 	KamataEngine::Camera camera_;
 	Player* player_ = nullptr;
 
-	Enemy* enemy_ = nullptr;
+	std::list<Enemy*> enemies_;
+
+	int enemySpoon = 1;
 
 	CameraController*cameraController_ = nullptr;
 
@@ -48,4 +50,6 @@ public:
 	void Update();
 	//描画
 	void Draw();
+	// 全ての当たり判定
+	void CheckAllCollisions();
 };

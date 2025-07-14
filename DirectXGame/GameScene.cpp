@@ -27,7 +27,14 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 
-	enemy_ = new Enemy();
+	for (int32_t i = 0; i <= enemySpoon; ++i) 
+	{
+		Enemy* newEnemy = new Enemy();
+		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(15 * i, 18);
+		newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
+
+		enemies_.push_back(newEnemy);
+	}
 
 	// カメラ
 	cameraController_ = new CameraController();
@@ -38,15 +45,12 @@ void GameScene::Initialize() {
 	CameraController::Rect cameraArea = {12.0f, (100 - 12.0f), 6.0f, 6.0f};
 	cameraController_->SetMovableArea(cameraArea);
 	
-
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
 
-	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(18, 18);
+	//Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(18, 18);
 
 	// 自キャラの初期化
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
-
-	enemy_->Initialize(modelEnemy_, &camera_, enemyPosition);
 
 	player_->SetMapChipField(mapChipField_);
 	// ブロック
@@ -82,7 +86,9 @@ GameScene::~GameScene()
 {
 	delete model_;
 	delete player_;
-	delete enemy_;
+	for (Enemy* enemy:enemies_) {
+		delete enemy;
+	}
 	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine:worldTransformBlocks_) 
 	{
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
@@ -96,18 +102,16 @@ GameScene::~GameScene()
 	delete cameraController_;
 }
 
-void GameScene::Update() 
-{
+void GameScene::Update() {
 	player_->Update();
-	enemy_->Update();
+	for (Enemy* enemy : enemies_) {
+		enemy->Update();
+	}
 	skydome_->Update();
 	cameraController_->Update();
-	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_)
-	{
-		for (WorldTransform* worldTransformBlock : worldTransformBlockLine)
-		{
-			if (!worldTransformBlock) 
-			{
+	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+			if (!worldTransformBlock) {
 				continue;
 			}
 			worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
@@ -118,36 +122,24 @@ void GameScene::Update()
 
 #ifdef _DEBUG
 
-	if (Input::GetInstance()->TriggerKey(DIK_0)) 
-	{
+	if (Input::GetInstance()->TriggerKey(DIK_0)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
 
 #endif // DEBUG
 
-	if (isDebugCameraActive_) 
-	{
+	if (isDebugCameraActive_) {
 		debugCamera_->Update();
 		camera_.matView = debugCamera_->GetCamera().matView;
 		camera_.matProjection = debugCamera_->GetCamera().matProjection;
 		camera_.TransferMatrix();
-	} 
-	else 
-	{
+	} else {
 		camera_.matView = cameraController_->GetViewProjection().matView;
 		camera_.matProjection = cameraController_->GetViewProjection().matProjection;
 		camera_.TransferMatrix();
 	}
 
-
-
-	/*for (WorldTransform* worldTransformBlock : worldTransformBlocks_) 
-	{
-		worldTransformBlock->matWorld_ = 
-			MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
-		worldTransformBlock->TransferMatrix();
-	}*/
-	
+	CheckAllCollisions();
 }
 
 void GameScene::Draw() 
@@ -155,7 +147,9 @@ void GameScene::Draw()
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	Model::PreDraw(dxCommon->GetCommandList());
 	player_->Draw();
-	enemy_->Draw();
+	for (Enemy* enemy : enemies_) {
+		enemy->Draw();
+	}
 	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			if (!worldTransformBlock) {
@@ -165,10 +159,42 @@ void GameScene::Draw()
 		}
 	}
 	skydome_->Draw();
-	/*for (WorldTransform* worldTransformBlock : worldTransformBlocks_) {
-		modelBlock_->Draw(*worldTransformBlock, camera_);
-	}*/
 	Model::PostDraw();
-	
-	
+}
+
+void GameScene::CheckAllCollisions()
+{
+	#pragma region 自キャラと敵キャラの当たり判定
+
+	// 判定対象1と2の座標
+	AABB aabb1, aabb2;
+
+	// 自キャラの座標
+	aabb1 = player_->GetAABB();
+
+	// 自キャラと敵弾全ての当たり判定
+	for (Enemy* enemy : enemies_)
+	{
+		aabb2 = enemy->GetAABB();
+		
+		// AABB同士の交差判定
+		if (IsCollision(aabb1,aabb2))
+		{
+			player_->OnCollision(enemy);
+
+			enemy->OnCollision(player_);
+		}
+	}
+
+
+	#pragma endregion
+
+	#pragma region 自キャラとアイテムの当たり判定
+
+	#pragma endregion
+
+	#pragma region 自弾と敵キャラの当たり判定
+
+	#pragma endregion
+
 }

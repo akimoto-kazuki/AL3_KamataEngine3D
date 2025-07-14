@@ -1,7 +1,11 @@
 #pragma once
 
 #include "KamataEngine.h"
+#include "MyMath.h"
+
 #include <vector>
+
+class Player;
 
 class Enemy 
 {
@@ -34,4 +38,11 @@ public:
 	void Update();
 	// 描画
 	void Draw();
+
+	KamataEngine::Vector3 GetWorldPosition();
+
+	AABB GetAABB();
+
+	void OnCollision(const Player* player);
+
 };
