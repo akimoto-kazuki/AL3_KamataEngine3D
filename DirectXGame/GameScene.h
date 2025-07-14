@@ -17,7 +17,7 @@ class GameScene
 
 	std::list<Enemy*> enemies_;
 
-	int enemySpoon = 1;
+	int enemySpoon = 3;
 
 	CameraController*cameraController_ = nullptr;
 

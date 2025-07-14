@@ -27,10 +27,10 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 
-	for (int32_t i = 0; i <= enemySpoon; ++i) 
+	for (int32_t i = 0; i < enemySpoon; ++i) 
 	{
 		Enemy* newEnemy = new Enemy();
-		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(15 * i, 18);
+		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(15 * i , 18);
 		newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
 
 		enemies_.push_back(newEnemy);
