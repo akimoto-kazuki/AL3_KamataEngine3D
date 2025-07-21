@@ -16,6 +16,8 @@ void GameScene::Initialize() {
 
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
+	modelDeath_ = Model::CreateFromOBJ("deathParticle", true);
+
 	skydome_ = new Skydome();
 
 	skydome_->Initialize(modelSkydome_, &camera_);
@@ -55,6 +57,9 @@ void GameScene::Initialize() {
 	player_->SetMapChipField(mapChipField_);
 	// ブロック
 	modelBlock_ = Model::CreateFromOBJ("block",true);
+
+	deathParticles_ = new DeathParticles();
+	deathParticles_->Initialize(modelDeath_, &camera_, playerPosition);
 
 	//デバッグ
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -100,6 +105,7 @@ GameScene::~GameScene()
 	delete modelSkydome_;
 	delete mapChipField_;
 	delete cameraController_;
+	delete deathParticles_;
 }
 
 void GameScene::Update() {
@@ -119,6 +125,10 @@ void GameScene::Update() {
 		}
 	}
 	debugCamera_->Update();
+	if (deathParticles_) 
+	{
+		deathParticles_->Update();
+	}
 
 #ifdef _DEBUG
 
@@ -159,7 +169,11 @@ void GameScene::Draw()
 		}
 	}
 	skydome_->Draw();
+	if (deathParticles_) {
+		deathParticles_->Draw();
+	}
 	Model::PostDraw();
+	
 }
 
 void GameScene::CheckAllCollisions()
