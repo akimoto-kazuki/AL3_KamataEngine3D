@@ -438,7 +438,6 @@ AABB Player::GetAABB()
 void Player::OnCollision(const Enemy* enemy)
 { 
 	(void)enemy;
-	velocity_ += KamataEngine::Vector3(0, 5, 0);
 }
 
 void Player::MapHitCheck(CollisionMapInfo& info) 

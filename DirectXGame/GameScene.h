@@ -6,6 +6,7 @@
 #include "MapChipField.h"
 #include "CameraController.h"
 #include <vector>
+#include "DeathParticles.h"
 
 class GameScene 
 {
@@ -33,6 +34,10 @@ class GameScene
 
 	MapChipField* mapChipField_;
 	void GenerateBlocks();
+
+	DeathParticles* deathParticles_ = nullptr;
+
+	KamataEngine::Model* modelDeath_= nullptr;
 
 private:
 
