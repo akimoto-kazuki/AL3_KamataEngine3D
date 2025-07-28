@@ -11,6 +11,14 @@
 class GameScene 
 {
 
+	enum class Phase
+	{
+		kPlay,
+		kDeath,
+	};
+
+	Phase phase_;
+
 	KamataEngine::Model* model_ = nullptr;
 	
 	KamataEngine::Camera camera_;
@@ -34,6 +42,7 @@ class GameScene
 
 	MapChipField* mapChipField_;
 	void GenerateBlocks();
+	void ChangePhase();
 
 	DeathParticles* deathParticles_ = nullptr;
 
@@ -57,4 +66,10 @@ public:
 	void Draw();
 	// 全ての当たり判定
 	void CheckAllCollisions();
+
+	// 終了
+	bool finished_ = false;
+
+	// デスフラグ
+	bool IsFinished() const { return finished_; }
 };

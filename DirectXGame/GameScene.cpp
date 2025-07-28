@@ -3,12 +3,12 @@
 
 using namespace KamataEngine;
 
-
-
 void GameScene::Initialize() {
 	//textureHandle_ = TextureManager::Load("202.png"); 
 	model_ = Model::Create();
 	camera_.Initialize();
+
+	phase_ = Phase::kPlay;
 
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
 
@@ -109,25 +109,51 @@ GameScene::~GameScene()
 }
 
 void GameScene::Update() {
-	player_->Update();
-	for (Enemy* enemy : enemies_) {
-		enemy->Update();
-	}
-	skydome_->Update();
-	cameraController_->Update();
-	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
-		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
-			if (!worldTransformBlock) {
-				continue;
-			}
-			worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
-			worldTransformBlock->TransferMatrix();
+
+	ChangePhase();
+	
+	switch (phase_) {
+
+	case GameScene::Phase::kPlay:
+		skydome_->Update();
+		player_->Update();
+		for (Enemy* enemy : enemies_) {
+			enemy->Update();
 		}
-	}
-	debugCamera_->Update();
-	if (deathParticles_) 
-	{
-		deathParticles_->Update();
+		cameraController_->Update();
+		debugCamera_->Update();
+		for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+			for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+				if (!worldTransformBlock) {
+					continue;
+				}
+				worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
+				worldTransformBlock->TransferMatrix();
+			}
+		}
+		CheckAllCollisions();
+		break;
+
+	case GameScene::Phase::kDeath:
+		skydome_->Update();
+		for (Enemy* enemy : enemies_) {
+			enemy->Update();
+		}
+		if (deathParticles_) {
+			deathParticles_->Update();
+		}
+		debugCamera_->Update();
+		for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+			for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+				if (!worldTransformBlock) {
+					continue;
+				}
+				worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
+				worldTransformBlock->TransferMatrix();
+			}
+		}
+		break;
+
 	}
 
 #ifdef _DEBUG
@@ -149,7 +175,31 @@ void GameScene::Update() {
 		camera_.TransferMatrix();
 	}
 
-	CheckAllCollisions();
+	
+}
+
+void GameScene::ChangePhase() {
+
+	switch (phase_) {
+
+	case GameScene::Phase::kPlay:
+		if (player_->isDead_)
+		{
+			phase_ = Phase::kDeath;
+
+			const Vector3& deathParticlesPosition = player_->GetWorldPosition();
+
+			deathParticles_->Initialize(modelDeath_, &camera_, deathParticlesPosition);
+		}
+		break;
+
+	case GameScene::Phase::kDeath:
+		if (deathParticles_ && deathParticles_->IsFinished()) {
+			finished_ = true;
+		}
+		break;
+	}
+	
 }
 
 void GameScene::Draw() 
