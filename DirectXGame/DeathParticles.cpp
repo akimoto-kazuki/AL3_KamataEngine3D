@@ -10,7 +10,7 @@
 using namespace KamataEngine;
 using namespace MathUtility;
 
-void DeathParticles::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera,KamataEngine::Vector3& position) {
+void DeathParticles::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera,const KamataEngine::Vector3& position) {
 	for (KamataEngine::WorldTransform& worldTransform:worldTransforms_)
 	{
 		assert(model);
@@ -25,7 +25,7 @@ void DeathParticles::Initialize(KamataEngine::Model* model, KamataEngine::Camera
 
 void DeathParticles::Update() 
 {
-	if (isFinished_) {
+	if (IsFinished()) {
 		return;
 	}
 	for (KamataEngine::WorldTransform& worldTransform : worldTransforms_) 
@@ -47,7 +47,7 @@ void DeathParticles::Update()
 	counter_ += 1.0f / 60.0f;
 	if (counter_ >= kDuration) {
 		counter_ = kDuration;
-		isFinished_ = true;
+		finished_ = true;
 	}
 	color_.w = std::clamp((1.0f - counter_ / kDuration), 0.0f, 1.0f);
 	objectColor_.SetColor(color_);
@@ -56,7 +56,7 @@ void DeathParticles::Update()
 
 void DeathParticles::Draw() 
 {
-	if (isFinished_) {
+	if (IsFinished()) {
 		return;
 	}
 	for (KamataEngine::WorldTransform& worldTransform : worldTransforms_)

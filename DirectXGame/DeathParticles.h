@@ -22,7 +22,7 @@ private:
 	// 分割した一個分の個数
 	static inline const float kAngleUnit = (std::numbers::pi_v<float> * 2) / kNumParticles;
 
-	bool isFinished_ = false;
+	
 
 	float counter_ = 0.0f;
 
@@ -32,8 +32,14 @@ private:
 
 public:
 
+	// 終了
+	bool finished_ = false;
+
+	// デスフラグ
+	bool IsFinished() const { return finished_; }
+
 	// 初期化
-	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera,KamataEngine::Vector3& position);
+	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera,const KamataEngine::Vector3& position);
 	// 更新
 	void Update();
 	// 描画

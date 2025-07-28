@@ -11,9 +11,6 @@ class Enemy;
 //自キャラ
 class Player 
 {
-	
-	
-	
 
 private:
 
@@ -131,5 +128,9 @@ public:
 	AABB GetAABB();
 
 	void OnCollision(const Enemy* enemy);
+
+	bool isDead_ = false;
+
+	bool IsDead() const { return isDead_; }
 
 };
