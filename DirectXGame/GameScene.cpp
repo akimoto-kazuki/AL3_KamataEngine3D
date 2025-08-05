@@ -8,7 +8,12 @@ void GameScene::Initialize() {
 	model_ = Model::Create();
 	camera_.Initialize();
 
-	phase_ = Phase::kPlay;
+	phase_ = Phase::kFadeIn;
+
+	fade_ = new Fade();
+	fade_->Initialize();
+
+	fade_->Start(Fade::Status::FadeIn, 1.0f);
 
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
 
@@ -106,55 +111,61 @@ GameScene::~GameScene()
 	delete mapChipField_;
 	delete cameraController_;
 	delete deathParticles_;
+	delete fade_;
 }
 
 void GameScene::Update() {
 
 	ChangePhase();
 	
+	fade_->Update();
+
 	switch (phase_) {
 
 	case GameScene::Phase::kPlay:
-		skydome_->Update();
-		player_->Update();
-		for (Enemy* enemy : enemies_) {
-			enemy->Update();
-		}
-		cameraController_->Update();
-		debugCamera_->Update();
-		for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
-			for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
-				if (!worldTransformBlock) {
-					continue;
-				}
-				worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
-				worldTransformBlock->TransferMatrix();
-			}
-		}
 		CheckAllCollisions();
+
+		if (player_->IsDead() == true) 
+		{
+			phase_ = Phase::kDeath;
+			const Vector3& deathParticlesPosition = player_->GetWorldPosition();
+			deathParticles_ = new DeathParticles;
+			deathParticles_->Initialize(modelDeath_, &camera_, deathParticlesPosition);
+		};
+		
 		break;
 
 	case GameScene::Phase::kDeath:
-		skydome_->Update();
-		for (Enemy* enemy : enemies_) {
-			enemy->Update();
+		
+		deathParticles_->Update();
+		if (deathParticles_ && deathParticles_->IsFinished()) 
+		{
+			phase_ = Phase::kFadeOut;
+			fade_->Start(Fade::Status::FadeOut, 1.0f);
 		}
-		if (deathParticles_) {
-			deathParticles_->Update();
+		break;
+	case GameScene::Phase::kFadeIn:
+		fade_->Update();
+		if (fade_->IsFinished()) 
+		{
+			phase_ = Phase::kPlay;
 		}
-		debugCamera_->Update();
-		for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
-			for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
-				if (!worldTransformBlock) {
-					continue;
-				}
-				worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
-				worldTransformBlock->TransferMatrix();
-			}
+		break;
+	case GameScene::Phase::kFadeOut:
+		fade_->Update();
+		if (fade_->IsFinished()) {
+			finished_ =  true;
 		}
 		break;
 
 	}
+
+	player_->Update();
+	skydome_->Update();
+	for (Enemy* enemy : enemies_) {
+		enemy->Update();
+	}
+	cameraController_->Update();
 
 #ifdef _DEBUG
 
@@ -175,6 +186,15 @@ void GameScene::Update() {
 		camera_.TransferMatrix();
 	}
 
+	for (std::vector<KamataEngine::WorldTransform*>& worldTransformBlockLine : worldTransformBlocks_) {
+		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
+			if (!worldTransformBlock) {
+				continue;
+			}
+			worldTransformBlock->matWorld_ = MakeAffineMatrix(worldTransformBlock->scale_, worldTransformBlock->rotation_, worldTransformBlock->translation_);
+			worldTransformBlock->TransferMatrix();
+		}
+	}
 	
 }
 
@@ -206,7 +226,11 @@ void GameScene::Draw()
 {
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	Model::PreDraw(dxCommon->GetCommandList());
-	player_->Draw();
+	if (phase_ == Phase::kPlay || phase_ == Phase::kFadeIn) 
+	{
+		player_->Draw();
+	}
+	
 	for (Enemy* enemy : enemies_) {
 		enemy->Draw();
 	}
@@ -223,6 +247,8 @@ void GameScene::Draw()
 		deathParticles_->Draw();
 	}
 	Model::PostDraw();
+
+	fade_->Draw();
 	
 }
 
