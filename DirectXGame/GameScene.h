@@ -7,6 +7,7 @@
 #include "CameraController.h"
 #include <vector>
 #include "DeathParticles.h"
+#include "Fade.h"
 
 class GameScene 
 {
@@ -15,6 +16,8 @@ class GameScene
 	{
 		kPlay,
 		kDeath,
+		kFadeIn,
+		kFadeOut,
 	};
 
 	Phase phase_;
@@ -72,4 +75,6 @@ public:
 
 	// デスフラグ
 	bool IsFinished() const { return finished_; }
+
+	Fade* fade_ = nullptr;
 };

@@ -20,16 +20,48 @@ void TitleScene::Initialize()
 	worldTransformPlayer_.translation_ = {0, -8, 0};
 	worldTransformPlayer_.rotation_.y = std::numbers::pi_v<float>;
 
+	fade_ = new Fade();
+	fade_->Initialize();
+
+	fade_->Start(Fade::Status::FadeIn, 1.0f);
+
 }
 
 TitleScene::~TitleScene()
 {
 	delete model_;
 	delete modelPlayer_;
+	delete fade_;
 }
 
 void TitleScene::Update()
 {
+
+	switch (phase_) {
+	
+	case TitleScene::Phase::kMain:
+		if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE))
+		{
+			phase_ = Phase::kFadeOut;
+			fade_->Start(Fade::Status::FadeOut, 1.0f);
+		}
+		break;
+	case TitleScene::Phase::kFadeIn:
+		fade_->Update();
+		if (fade_->IsFinished())
+		{
+			phase_ = Phase::kMain;
+		}
+		break;
+	case TitleScene::Phase::kFadeOut:
+		fade_->Update();
+		if (fade_->IsFinished()) {
+			finished_ = true;
+		}
+		break;
+	
+	}
+
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
 	
@@ -38,10 +70,12 @@ void TitleScene::Update()
 	worldTransformPlayer_.matWorld_ = MakeAffineMatrix(worldTransformPlayer_.scale_, worldTransformPlayer_.rotation_, worldTransformPlayer_.translation_);
 	worldTransformPlayer_.TransferMatrix();
 
-	if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) 
+	/*if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) 
 	{
 		finished_ = true;
 	}
+
+	fade_->Update();*/
 }
 
 void TitleScene::Draw() 
@@ -54,4 +88,7 @@ void TitleScene::Draw()
 	modelPlayer_->Draw(worldTransformPlayer_, camera_);
 
 	Model::PostDraw();
+
+	fade_->Draw();
+
 }
