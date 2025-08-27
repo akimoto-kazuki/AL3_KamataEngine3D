@@ -8,6 +8,8 @@
 #include <vector>
 #include "DeathParticles.h"
 #include "Fade.h"
+#include "Goal.h"
+
 
 class GameScene 
 {
@@ -33,6 +35,8 @@ class GameScene
 
 	CameraController*cameraController_ = nullptr;
 
+	Goal* goal_ = nullptr;
+
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 
 	KamataEngine::Model* modelSkydome_ = nullptr;
@@ -40,6 +44,8 @@ class GameScene
 	KamataEngine::Model* modelPlayer_ = nullptr;
 
 	KamataEngine::Model* modelEnemy_ = nullptr;
+
+	KamataEngine::Model* modelGoal_ = nullptr;
 
 	Skydome* skydome_ = nullptr;
 
@@ -75,6 +81,12 @@ public:
 
 	// デスフラグ
 	bool IsFinished() const { return finished_; }
+
+	// クリア
+	bool clear_ = false;
+
+	bool IsClear() const { return clear_; }
+
 
 	Fade* fade_ = nullptr;
 };

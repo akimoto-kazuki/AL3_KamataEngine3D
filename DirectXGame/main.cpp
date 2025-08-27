@@ -86,7 +86,8 @@ void ChangeScene()
 		}
 		break;
 	case Scene::kGame:
-		if (gameScene->IsFinished()) {
+		if (gameScene->IsFinished())
+		{
 			scene = Scene::kTitle;
 			delete gameScene;
 			gameScene = nullptr;
