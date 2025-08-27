@@ -12,7 +12,7 @@ void TitleScene::Initialize()
 	camera_.Initialize();
 
 	worldTransform_.Initialize();
-	worldTransform_.scale_ = {2, 2, 2};
+	worldTransform_.scale_ = {5, 5, 5};
 	worldTransform_.translation_ = {0, 8, 0};
 
 	worldTransformPlayer_.Initialize();

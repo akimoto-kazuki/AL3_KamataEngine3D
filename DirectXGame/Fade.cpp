@@ -34,6 +34,13 @@ void Fade::Update()
 		}
 		sprite_->SetColor(Vector4(0,0,0,std::clamp(counter_ / duration_,0.0f,1.0f)));
 		break;
+	case Fade::Status::ClearFadeOut:
+		counter_ += 1.0f / 60.0f;
+		if (counter_ >= duration_) {
+			counter_ = duration_;
+		}
+		sprite_->SetColor(Vector4(0, 0, 0, std::clamp(counter_ / duration_, 0.0f, 1.0f)));
+		break;
 	}
 }
 

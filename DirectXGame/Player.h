@@ -48,7 +48,7 @@ private:
 	// 移動
 	static inline const float kAcceleration = 0.2f;
 
-	static inline const float kAttenuation = 0.1f;
+	static inline const float kAttenuation = 0.2f;
 	static inline const float kLimitRunSpeed = 0.1f;
 
 	static inline const float kBlank = 0.1f;

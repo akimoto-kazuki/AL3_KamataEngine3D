@@ -29,7 +29,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	//エンジンの初期化
-	KamataEngine::Initialize(L"LE2D_03_アキモト_カズキ_AL3");
+	KamataEngine::Initialize(L"LE2D_03_アキモト_カズキ_小さな部屋～敵を回避しろ～");
 
 	scene = Scene::kTitle;
 	titleScene = new TitleScene;

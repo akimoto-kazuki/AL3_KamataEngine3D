@@ -8,8 +8,7 @@
 #include <vector>
 #include "DeathParticles.h"
 #include "Fade.h"
-#include "Goal.h"
-
+#include <time.h>
 
 class GameScene 
 {
@@ -20,6 +19,7 @@ class GameScene
 		kDeath,
 		kFadeIn,
 		kFadeOut,
+		kClearFadeOut,
 	};
 
 	Phase phase_;
@@ -31,11 +31,9 @@ class GameScene
 
 	std::list<Enemy*> enemies_;
 
-	int enemySpoon = 3;
+	int enemySpoon = 25;
 
 	CameraController*cameraController_ = nullptr;
-
-	Goal* goal_ = nullptr;
 
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 
@@ -44,8 +42,6 @@ class GameScene
 	KamataEngine::Model* modelPlayer_ = nullptr;
 
 	KamataEngine::Model* modelEnemy_ = nullptr;
-
-	KamataEngine::Model* modelGoal_ = nullptr;
 
 	Skydome* skydome_ = nullptr;
 
@@ -57,12 +53,17 @@ class GameScene
 
 	KamataEngine::Model* modelDeath_= nullptr;
 
+	
+
 private:
 
 	uint32_t textureHandle_ = 0;
 	KamataEngine::Model* modelBlock_;
 	KamataEngine::DebugCamera* debugCamera_ = nullptr;
 	bool isDebugCameraActive_ = false;
+	int countTimer = 0;
+	int countMin = 0;
+	int isCountDown = false;
 
 
 public:
