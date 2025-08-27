@@ -23,6 +23,8 @@ void GameScene::Initialize() {
 
 	modelDeath_ = Model::CreateFromOBJ("deathParticle", true);
 
+	modelGoal_ = Model::CreateFromOBJ("goal", true);
+
 	skydome_ = new Skydome();
 
 	skydome_->Initialize(modelSkydome_, &camera_);
@@ -56,6 +58,8 @@ void GameScene::Initialize() {
 
 	//Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(18, 18);
 
+	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(4, 18);
+
 	// 自キャラの初期化
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 
@@ -65,6 +69,8 @@ void GameScene::Initialize() {
 
 	deathParticles_ = new DeathParticles();
 	deathParticles_->Initialize(modelDeath_, &camera_, playerPosition);
+
+	goal_->Initialize(modelGoal_, &camera_, goalPosition);
 
 	//デバッグ
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -112,6 +118,7 @@ GameScene::~GameScene()
 	delete cameraController_;
 	delete deathParticles_;
 	delete fade_;
+	delete goal_;
 }
 
 void GameScene::Update() {
@@ -132,6 +139,10 @@ void GameScene::Update() {
 			deathParticles_ = new DeathParticles;
 			deathParticles_->Initialize(modelDeath_, &camera_, deathParticlesPosition);
 		};
+		if (KamataEngine::Input::GetInstance()->PushKey(DIK_R))
+		{
+			finished_ = true;
+		}
 		
 		break;
 
@@ -246,6 +257,9 @@ void GameScene::Draw()
 	if (deathParticles_) {
 		deathParticles_->Draw();
 	}
+	
+	goal_->Draw();
+
 	Model::PostDraw();
 
 	fade_->Draw();
@@ -280,6 +294,11 @@ void GameScene::CheckAllCollisions()
 	#pragma endregion
 
 	#pragma region 自キャラとアイテムの当たり判定
+
+	/*AABB aabb3, aabb4;
+
+	aabb3 = player_->GetAABB();*/
+
 
 	#pragma endregion
 
