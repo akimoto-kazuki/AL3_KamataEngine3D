@@ -12,6 +12,7 @@ public:
 		None,
 		FadeIn,
 		FadeOut,
+		ClearFadeOut,
 	};
 
 	// 初期化

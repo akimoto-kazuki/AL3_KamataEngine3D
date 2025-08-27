@@ -3,6 +3,7 @@
 
 using namespace KamataEngine;
 
+
 void GameScene::Initialize() {
 	//textureHandle_ = TextureManager::Load("202.png"); 
 	model_ = Model::Create();
@@ -23,8 +24,6 @@ void GameScene::Initialize() {
 
 	modelDeath_ = Model::CreateFromOBJ("deathParticle", true);
 
-	modelGoal_ = Model::CreateFromOBJ("goal", true);
-
 	skydome_ = new Skydome();
 
 	skydome_->Initialize(modelSkydome_, &camera_);
@@ -36,10 +35,16 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 
+	unsigned int currentTime = unsigned int(time(nullptr));
+	srand(currentTime);
+
+	countMin = 30;
+	isCountDown = true;
+
 	for (int32_t i = 0; i < enemySpoon; ++i) 
 	{
 		Enemy* newEnemy = new Enemy();
-		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(15 * i , 18);
+		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(20 + (5 * i), (rand() % 11 + 8));
 		newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
 
 		enemies_.push_back(newEnemy);
@@ -58,8 +63,6 @@ void GameScene::Initialize() {
 
 	//Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(18, 18);
 
-	Vector3 goalPosition = mapChipField_->GetMapChipPositionByIndex(4, 18);
-
 	// 自キャラの初期化
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 
@@ -70,10 +73,10 @@ void GameScene::Initialize() {
 	deathParticles_ = new DeathParticles();
 	deathParticles_->Initialize(modelDeath_, &camera_, playerPosition);
 
-	goal_->Initialize(modelGoal_, &camera_, goalPosition);
-
 	//デバッグ
 	debugCamera_ = new DebugCamera(1280, 720);
+
+	
 }
 
 void GameScene::GenerateBlocks() {
@@ -118,7 +121,6 @@ GameScene::~GameScene()
 	delete cameraController_;
 	delete deathParticles_;
 	delete fade_;
-	delete goal_;
 }
 
 void GameScene::Update() {
@@ -131,7 +133,19 @@ void GameScene::Update() {
 
 	case GameScene::Phase::kPlay:
 		CheckAllCollisions();
-
+		if (isCountDown)
+		{
+			countTimer++;
+			if (countTimer >= 59)
+			{
+				countTimer = 0;
+				countMin-=1;
+			}
+			if (countMin <= 0)
+			{
+				phase_ = Phase::kClearFadeOut;
+			}
+		}
 		if (player_->IsDead() == true) 
 		{
 			phase_ = Phase::kDeath;
@@ -147,7 +161,7 @@ void GameScene::Update() {
 		break;
 
 	case GameScene::Phase::kDeath:
-		
+		isCountDown = false;
 		deathParticles_->Update();
 		if (deathParticles_ && deathParticles_->IsFinished()) 
 		{
@@ -160,12 +174,19 @@ void GameScene::Update() {
 		if (fade_->IsFinished()) 
 		{
 			phase_ = Phase::kPlay;
+			
 		}
 		break;
 	case GameScene::Phase::kFadeOut:
 		fade_->Update();
 		if (fade_->IsFinished()) {
 			finished_ =  true;
+		}
+		break;
+	case GameScene::Phase::kClearFadeOut:
+		fade_->Update();
+		if (fade_->IsFinished()) {
+			finished_ = true;
 		}
 		break;
 
@@ -237,7 +258,7 @@ void GameScene::Draw()
 {
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	Model::PreDraw(dxCommon->GetCommandList());
-	if (phase_ == Phase::kPlay || phase_ == Phase::kFadeIn) 
+	if (phase_ == Phase::kPlay || phase_ == Phase::kFadeIn || phase_ == Phase::kClearFadeOut) 
 	{
 		player_->Draw();
 	}
@@ -257,8 +278,6 @@ void GameScene::Draw()
 	if (deathParticles_) {
 		deathParticles_->Draw();
 	}
-	
-	goal_->Draw();
 
 	Model::PostDraw();
 
@@ -294,10 +313,6 @@ void GameScene::CheckAllCollisions()
 	#pragma endregion
 
 	#pragma region 自キャラとアイテムの当たり判定
-
-	/*AABB aabb3, aabb4;
-
-	aabb3 = player_->GetAABB();*/
 
 
 	#pragma endregion
