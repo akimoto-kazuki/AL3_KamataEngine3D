@@ -94,6 +94,7 @@ void Player::InputMove()
 			velocity_ += KamataEngine::Vector3(0, kJumpAcceleration, 0);
 			
 		}
+
 	} 
 	else // 空中
 	{
