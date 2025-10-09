@@ -9,6 +9,10 @@
 #include "DeathParticles.h"
 #include "Fade.h"
 #include <time.h>
+#include "Shoot.h"
+#include "Mouse.h"
+#include "Cursor3D.h"
+#include "CameraRay.h"
 
 class GameScene 
 {
@@ -53,7 +57,9 @@ class GameScene
 
 	KamataEngine::Model* modelDeath_= nullptr;
 
-	
+	KamataEngine::Vector3 mousePos_;
+
+	KamataEngine::Model* modelLockOn_ = nullptr;
 
 private:
 
@@ -65,10 +71,27 @@ private:
 	int countMin = 0;
 	int isCountDown = false;
 
+	DirectXCommon* dxCommon = nullptr;
+
+	ID3D12Device* device = nullptr;
+	ID3D11DeviceContext* context = nullptr;
+
+	// 自前クラス
+	Mouse mouse;
+	CameraRay ray;
+	Cursor3D* cursor = nullptr;
+
+	// カメラ行列（仮）
+	DirectX::XMMATRIX view;
+	DirectX::XMMATRIX proj;
+
+	
+
 
 public:
 	//初期化
 	void Initialize();
+	GameScene();
 	~GameScene();
 	//更新
 	void Update();
@@ -88,6 +111,7 @@ public:
 
 	bool IsClear() const { return clear_; }
 
+	const KamataEngine::Vector3& GetMousePosition() const { return mousePos_; }
 
 	Fade* fade_ = nullptr;
 };

@@ -12,6 +12,7 @@ enum class Scene {
 	kGame,
 
 };
+
 Scene scene = Scene::kUnknown;
 
 GameScene* gameScene = nullptr;

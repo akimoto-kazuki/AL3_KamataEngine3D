@@ -1,8 +1,9 @@
 #include "GameScene.h"
 #include "MyMath.h"
+#include <cassert>
 
 using namespace KamataEngine;
-
+using namespace DirectX;
 
 void GameScene::Initialize() {
 	//textureHandle_ = TextureManager::Load("202.png"); 
@@ -23,6 +24,8 @@ void GameScene::Initialize() {
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
 	modelDeath_ = Model::CreateFromOBJ("deathParticle", true);
+
+	modelLockOn_ = Model::CreateFromOBJ("player", true);
 
 	skydome_ = new Skydome();
 
@@ -70,6 +73,17 @@ void GameScene::Initialize() {
 	// ブロック
 	modelBlock_ = Model::CreateFromOBJ("block",true);
 
+	dxCommon = DirectXCommon::GetInstance();
+	assert(dxCommon);
+
+	device = dxCommon->GetDevice();
+	context = dxCommon->GetCommandList();
+
+	cursor = new Cursor3D(device);
+
+	view = XMMatrixIdentity();
+	proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), 16.0f/9.0f, 0.1f, 1000.0f);
+
 	deathParticles_ = new DeathParticles();
 	deathParticles_->Initialize(modelDeath_, &camera_, playerPosition);
 
@@ -77,6 +91,11 @@ void GameScene::Initialize() {
 	debugCamera_ = new DebugCamera(1280, 720);
 
 	
+}
+
+GameScene::GameScene() 
+{
+
 }
 
 void GameScene::GenerateBlocks() {
@@ -121,6 +140,7 @@ GameScene::~GameScene()
 	delete cameraController_;
 	delete deathParticles_;
 	delete fade_;
+	delete cursor;
 }
 
 void GameScene::Update() {
@@ -128,6 +148,12 @@ void GameScene::Update() {
 	ChangePhase();
 	
 	fade_->Update();
+
+	HWND hwnd = dxCommon
+	mouse.Update(hwnd);
+	POINT pos = mouse.GetPosition();
+
+	ray.Update(pos.x, pos.y, screenWidth, screenHeight, view, proj);
 
 	switch (phase_) {
 
@@ -278,6 +304,9 @@ void GameScene::Draw()
 	if (deathParticles_) {
 		deathParticles_->Draw();
 	}
+
+	POINT pos = mouse.GetPosition();
+	cursor->Draw(context, screenWidth, screenHeight, pos.x, pos.y);
 
 	Model::PostDraw();
 
