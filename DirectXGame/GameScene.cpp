@@ -77,9 +77,6 @@ void GameScene::Initialize() {
 	assert(dxCommon);
 
 	device = dxCommon->GetDevice();
-	context = dxCommon->GetCommandList();
-
-	cursor = new Cursor3D(device);
 
 	view = XMMatrixIdentity();
 	proj = XMMatrixPerspectiveFovLH(XMConvertToRadians(45.0f), 16.0f/9.0f, 0.1f, 1000.0f);
@@ -90,6 +87,8 @@ void GameScene::Initialize() {
 	//デバッグ
 	debugCamera_ = new DebugCamera(1280, 720);
 
+	cursor = new Cursor3D();
+	cursor->Initialize();
 	
 }
 
@@ -148,12 +147,6 @@ void GameScene::Update() {
 	ChangePhase();
 	
 	fade_->Update();
-
-	HWND hwnd = dxCommon
-	mouse.Update(hwnd);
-	POINT pos = mouse.GetPosition();
-
-	ray.Update(pos.x, pos.y, screenWidth, screenHeight, view, proj);
 
 	switch (phase_) {
 
@@ -224,6 +217,7 @@ void GameScene::Update() {
 		enemy->Update();
 	}
 	cameraController_->Update();
+	cursor->Update();
 
 #ifdef _DEBUG
 
@@ -282,7 +276,7 @@ void GameScene::ChangePhase() {
 
 void GameScene::Draw() 
 {
-	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
+	dxCommon = DirectXCommon::GetInstance();
 	Model::PreDraw(dxCommon->GetCommandList());
 	if (phase_ == Phase::kPlay || phase_ == Phase::kFadeIn || phase_ == Phase::kClearFadeOut) 
 	{
@@ -306,7 +300,8 @@ void GameScene::Draw()
 	}
 
 	POINT pos = mouse.GetPosition();
-	cursor->Draw(context, screenWidth, screenHeight, pos.x, pos.y);
+	
+	cursor->Draw();
 
 	Model::PostDraw();
 
