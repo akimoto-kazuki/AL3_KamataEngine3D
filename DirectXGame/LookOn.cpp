@@ -107,3 +107,4 @@ KamataEngine::Vector3 LookOn::GetWorldPosition()
 
 	return worldPos;
 }
+
