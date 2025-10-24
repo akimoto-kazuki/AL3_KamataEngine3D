@@ -51,9 +51,9 @@ void Player::InputMove()
 {
 	if (onGround_) 
 	{
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_RIGHT) || KamataEngine::Input::GetInstance()->PushKey(DIK_LEFT)) {
+		if (KamataEngine::Input::GetInstance()->PushKey(DIK_D) || KamataEngine::Input::GetInstance()->PushKey(DIK_A)) {
 			KamataEngine::Vector3 acceleration = {};
-			if (KamataEngine::Input::GetInstance()->PushKey(DIK_RIGHT)) {
+			if (KamataEngine::Input::GetInstance()->PushKey(DIK_D)) {
 				if (velocity_.x < 0.0f) {
 					velocity_.x *= (1.0f - kAttenuation);
 				}
@@ -65,7 +65,7 @@ void Player::InputMove()
 				}
 
 			} 
-			else if (KamataEngine::Input::GetInstance()->PushKey(DIK_LEFT)) 
+			else if (KamataEngine::Input::GetInstance()->PushKey(DIK_A)) 
 			{
 				if (velocity_.x > 0.0f)
 				{
@@ -89,7 +89,7 @@ void Player::InputMove()
 			velocity_.x *= (1.0f - kAttenuation);
 		}
 
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_UP)) 
+		if (KamataEngine::Input::GetInstance()->PushKey(DIK_W)) 
 		{
 			velocity_ += KamataEngine::Vector3(0, kJumpAcceleration, 0);
 			
