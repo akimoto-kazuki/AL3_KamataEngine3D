@@ -5,7 +5,7 @@ using namespace KamataEngine;
 
 
 void GameScene::Initialize() {
-	//textureHandle_ = TextureManager::Load("202.png"); 
+	
 	model_ = Model::Create();
 	camera_.Initialize();
 
@@ -24,6 +24,11 @@ void GameScene::Initialize() {
 
 	modelDeath_ = Model::CreateFromOBJ("deathParticle", true);
 
+	modelLookOn_ = Model::CreateFromOBJ("cube", true);
+
+	// ブロック
+	modelBlock_ = Model::CreateFromOBJ("block", true);
+
 	skydome_ = new Skydome();
 
 	skydome_->Initialize(modelSkydome_, &camera_);
@@ -34,6 +39,10 @@ void GameScene::Initialize() {
 
 	// 自キャラの生成
 	player_ = new Player();
+
+	lookOn_ = new LookOn();
+
+	deathParticles_ = new DeathParticles();
 
 	unsigned int currentTime = unsigned int(time(nullptr));
 	srand(currentTime);
@@ -55,11 +64,11 @@ void GameScene::Initialize() {
 	cameraController_->Initialize();
 	cameraController_->SetTarget(player_);
 	cameraController_->Reset();
-	
 	CameraController::Rect cameraArea = {12.0f, (100 - 12.0f), 6.0f, 6.0f};
 	cameraController_->SetMovableArea(cameraArea);
 	
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
+	Vector3 lookOnPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
 
 	//Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(18, 18);
 
@@ -67,11 +76,10 @@ void GameScene::Initialize() {
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 
 	player_->SetMapChipField(mapChipField_);
-	// ブロック
-	modelBlock_ = Model::CreateFromOBJ("block",true);
-
-	deathParticles_ = new DeathParticles();
+	
 	deathParticles_->Initialize(modelDeath_, &camera_, playerPosition);
+
+	lookOn_->Initialize(modelLookOn_, &camera_, lookOnPosition);
 
 	//デバッグ
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -121,6 +129,7 @@ GameScene::~GameScene()
 	delete cameraController_;
 	delete deathParticles_;
 	delete fade_;
+	delete lookOn_;
 }
 
 void GameScene::Update() {
@@ -193,6 +202,7 @@ void GameScene::Update() {
 	}
 
 	player_->Update();
+	lookOn_->Update();
 	skydome_->Update();
 	for (Enemy* enemy : enemies_) {
 		enemy->Update();
@@ -262,7 +272,6 @@ void GameScene::Draw()
 	{
 		player_->Draw();
 	}
-	
 	for (Enemy* enemy : enemies_) {
 		enemy->Draw();
 	}
@@ -274,12 +283,19 @@ void GameScene::Draw()
 			modelBlock_->Draw(*worldTransformBlock, camera_);
 		}
 	}
+	lookOn_->Draw();
 	skydome_->Draw();
 	if (deathParticles_) {
 		deathParticles_->Draw();
 	}
 
 	Model::PostDraw();
+
+	Sprite::PreDraw(dxCommon->GetCommandList());
+
+	//lookOn_->Draw();
+
+	Sprite::PostDraw();
 
 	fade_->Draw();
 	

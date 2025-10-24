@@ -9,6 +9,7 @@
 #include "DeathParticles.h"
 #include "Fade.h"
 #include <time.h>
+#include "LookOn.h"
 
 class GameScene 
 {
@@ -25,17 +26,6 @@ class GameScene
 	Phase phase_;
 
 	KamataEngine::Model* model_ = nullptr;
-	
-	KamataEngine::Camera camera_;
-	Player* player_ = nullptr;
-
-	std::list<Enemy*> enemies_;
-
-	int enemySpoon = 25;
-
-	CameraController*cameraController_ = nullptr;
-
-	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 
 	KamataEngine::Model* modelSkydome_ = nullptr;
 
@@ -43,15 +33,31 @@ class GameScene
 
 	KamataEngine::Model* modelEnemy_ = nullptr;
 
+	KamataEngine::Model* modelLookOn_ = nullptr;
+
+	KamataEngine::Model* modelDeath_ = nullptr;
+
+	KamataEngine::Camera camera_;
+
+	CameraController*cameraController_ = nullptr;
+
+	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
+
+	Player* player_ = nullptr;
+
+	std::list<Enemy*> enemies_;
+
+	int enemySpoon = 25;
+
 	Skydome* skydome_ = nullptr;
+
+	DeathParticles* deathParticles_ = nullptr;
+
+	LookOn* lookOn_ = nullptr;
 
 	MapChipField* mapChipField_;
 	void GenerateBlocks();
 	void ChangePhase();
-
-	DeathParticles* deathParticles_ = nullptr;
-
-	KamataEngine::Model* modelDeath_= nullptr;
 
 	
 
