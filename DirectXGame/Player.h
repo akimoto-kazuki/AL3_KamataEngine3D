@@ -12,8 +12,6 @@ class Enemy;
 class Player 
 {
 
-private:
-
 	enum LRDirection {
 		kRiget,
 		kLeft,
@@ -29,12 +27,67 @@ private:
 	};
 
 	struct CollisionMapInfo {
-		bool ceiling = false; // 天井衝突フラグ
-		bool landing = false; // 着地フラグ
-		bool hitWall = false; // 壁衝突フラグ
-		KamataEngine::Vector3 move;         // 移動量
+		bool ceiling = false;       // 天井衝突フラグ
+		bool landing = false;       // 着地フラグ
+		bool hitWall = false;       // 壁衝突フラグ
+		KamataEngine::Vector3 move; // 移動量
 	};
 
+
+public:
+	// 初期化
+	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position);
+	// 更新
+	void Update();
+	// 描画
+	void Draw();
+	// 1 移動入力
+	void InputMove();
+	// 2 移動量を加味して衝突判定する
+	// 上方向
+	void MapHitCheckUP(CollisionMapInfo& info);
+	// 下方向
+	void MapHitCheckDown(CollisionMapInfo& info);
+	// 右方向
+	void MapHitCheckRight(CollisionMapInfo& info);
+	// 左方向
+	void MapHitCheckLeft(CollisionMapInfo& info);
+	// 3 判定結果を反映して移動させる
+	void MapHitMove(const CollisionMapInfo& info);
+	// 4 天井に接触している場合の処理
+	void CheckMapCeiling(const CollisionMapInfo& info);
+	// 5
+	void HitWall(const CollisionMapInfo& info);
+	// 6 接地状態の切り替え
+	void CheckMapLanding(const CollisionMapInfo& info);
+	// 7 旋回制御
+	void AnimateTurn();
+	// マップ衝突チェック
+	void MapHitCheck(CollisionMapInfo& info);
+
+	KamataEngine::Vector3 CornerPosition(const KamataEngine::Vector3& center, Corner corner);
+
+	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
+
+	const KamataEngine::WorldTransform& GetWorldTransform() const { return worldTransform_; }
+
+	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
+
+	KamataEngine::Vector3 GetWorldPosition();
+
+	AABB GetAABB();
+
+	void OnCollision(const Enemy* enemy);
+
+	bool isDead_ = false;
+
+	bool IsDead() const { return isDead_; }
+
+
+
+private:
+
+	
 
 	KamataEngine::WorldTransform worldTransform_;
 	KamataEngine::Model* model_ = nullptr;
@@ -81,56 +134,5 @@ private:
 	static inline const float kAttenuationLanding = 0.0001f;
 	static inline const float kAttenuationWall = 0.0001f;
 	static inline const float kGroundSearchHeight = 0.1f;
-
-public:
-
-	//初期化
-	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera,KamataEngine::Vector3& position);
-	//更新
-	void Update();
-	//描画
-	void Draw();
-	// 1 移動入力
-	void InputMove();
-	// 2 移動量を加味して衝突判定する
-	// 上方向
-	void MapHitCheckUP(CollisionMapInfo& info);
-	// 下方向
-	void MapHitCheckDown(CollisionMapInfo& info);
-	// 右方向
-	void MapHitCheckRight(CollisionMapInfo& info);
-	// 左方向
-	void MapHitCheckLeft(CollisionMapInfo& info);
-	// 3 判定結果を反映して移動させる
-	void MapHitMove(const CollisionMapInfo& info);
-	// 4 天井に接触している場合の処理
-	void CheckMapCeiling(const CollisionMapInfo& info);
-	// 5
-	void HitWall(const CollisionMapInfo& info);
-	// 6 接地状態の切り替え
-	void CheckMapLanding(const CollisionMapInfo& info);
-	// 7 旋回制御
-	void AnimateTurn();
-	// マップ衝突チェック
-	void MapHitCheck(CollisionMapInfo& info);
-	
-
-	KamataEngine::Vector3 CornerPosition(const KamataEngine::Vector3& center, Corner corner);
-
-	void SetMapChipField(MapChipField* mapChipField) { mapChipField_ = mapChipField; }
-
-	const KamataEngine::WorldTransform& GetWorldTransform() const { return worldTransform_; }
-
-	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
-
-	KamataEngine::Vector3 GetWorldPosition();
-
-	AABB GetAABB();
-
-	void OnCollision(const Enemy* enemy);
-
-	bool isDead_ = false;
-
-	bool IsDead() const { return isDead_; }
 
 };
