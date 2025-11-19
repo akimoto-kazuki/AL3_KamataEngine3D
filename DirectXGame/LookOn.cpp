@@ -30,8 +30,10 @@ void LookOn::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera
 
 void LookOn::Update()
 {
-	InputMove(); 
+	//InputMove(); 
 	//MouseMove();
+
+	
 
 	WorldTransformUpdate();
 	HomingReticle();
@@ -47,6 +49,34 @@ void LookOn::HomingReticle()
 	// ワールド→Screen座標変換
 	positionReticle = Transform(positionReticle, matViewProjectionViewport);
 	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+
+	POINT mousePosition;
+	// マウス座標(スクリーン座標)を取得する
+	GetCursorPos(&mousePosition);
+	// クライアントエリア座標に変換する
+	HWND hwnd = WinApp::GetInstance()->GetHwnd();
+	ScreenToClient(hwnd, &mousePosition);
+
+	// マウス座標を2Dレティクルのスプライトに代入する
+	sprite2DReticle_->SetPosition(Vector2(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y)));
+	// ビュープロジェクションビューポート合成行列
+	Matrix4x4 matVPV = camera_->matView * camera_->matProjection * matViewport;
+	// 合成行列の逆行列を計算する
+	Matrix4x4 matInverseVPV = Inverse(matVPV);
+	// スクリーン座標
+	Vector3 posNear = Vector3(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y), 0);
+	Vector3 posFar = Vector3(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y), 1);
+	// スクリーン座標系からワールド座標系へ
+	posNear = Transform(posNear, matInverseVPV);
+	posFar = Transform(posFar, matInverseVPV);
+
+	// マウスレイの方向
+	Vector3 mouseDirection = posFar - posNear;
+	mouseDirection = Normalize(mouseDirection);
+
+	// カメラから照準オブジェクトの距離
+	const float kDistanceTestObject = 2.0f;
+	worldTransform_.translation_ = posNear + mouseDirection * kDistanceTestObject;
 }
 
 void LookOn::Draw() 

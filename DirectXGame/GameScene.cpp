@@ -289,7 +289,7 @@ void GameScene::Draw()
 			modelBlock_->Draw(*worldTransformBlock, camera_);
 		}
 	}
-	lookOn_->Draw();
+	//lookOn_->Draw();
 	skydome_->Draw();
 	if (deathParticles_) {
 		deathParticles_->Draw();
