@@ -26,15 +26,11 @@ void LookOn::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera
 	uint32_t textureReticle = TextureManager::Load("lookOn.png");
 	// スプライト生成
 	sprite2DReticle_ = Sprite::Create(textureReticle, {640.0f,310.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
+	sprite2DReticle_->SetSize({64.0f, 64.0f});
 }
 
 void LookOn::Update()
 {
-	//InputMove(); 
-	//MouseMove();
-
-	
-
 	WorldTransformUpdate();
 	HomingReticle();
 }
@@ -79,62 +75,11 @@ void LookOn::HomingReticle()
 	worldTransform_.translation_ = posNear + mouseDirection * kDistanceTestObject;
 }
 
-void LookOn::Draw() 
-{ 
-	model_->Draw(worldTransform_, *camera_); 
-}
-
 void LookOn::DrawUI()
 {
 	sprite2DReticle_->Draw(); 
 }
 
-void LookOn::InputMove()
-{
-	if (KamataEngine::Input::GetInstance()->PushKey(DIK_RIGHT) || KamataEngine::Input::GetInstance()->PushKey(DIK_LEFT))
-	{
-		KamataEngine::Vector3 acceleration = {};
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_RIGHT)) {
-			if (velocity_.x < 0.0f) {
-				velocity_.x *= (1.0f - kAttenuation);
-			}
-			acceleration.x += kAcceleration;
-
-		} else if (KamataEngine::Input::GetInstance()->PushKey(DIK_LEFT)) {
-			if (velocity_.x > 0.0f) {
-				velocity_.x *= (1.0f - kAttenuation);
-			}
-			acceleration.x -= kAcceleration;
-		}
-		velocity_ += acceleration;
-		velocity_.x = std::clamp(velocity_.x, -kLimitRunSpeed, kLimitRunSpeed);
-	} 
-	else
-	{
-		velocity_.x *= (1.0f - kAttenuation);
-	}
-	if (KamataEngine::Input::GetInstance()->PushKey(DIK_UP) || KamataEngine::Input::GetInstance()->PushKey(DIK_DOWN)) {
-		KamataEngine::Vector3 acceleration = {};
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_UP)) {
-			if (velocity_.y < 0.0f)
-			{
-				velocity_.y *= (1.0f - kAttenuation);
-			}
-			acceleration.y += kAcceleration;
-
-		} else if (KamataEngine::Input::GetInstance()->PushKey(DIK_DOWN)) {
-			if (velocity_.y > 0.0f) {
-				velocity_.y *= (1.0f - kAttenuation);
-			}
-			acceleration.y -= kAcceleration;
-		}
-		velocity_ += acceleration;
-		velocity_.y = std::clamp(velocity_.y, -kLimitRunSpeed, kLimitRunSpeed);
-
-	} else {
-		velocity_.y *= (1.0f - kAttenuation);
-	}
-}
 #include <iostream>
 void LookOn::MouseMove()
 {
@@ -149,9 +94,6 @@ void LookOn::WorldTransformUpdate()
 	worldTransform_.translation_.x += velocity_.x;
 	worldTransform_.translation_.y += velocity_.y;
 	worldTransform_.translation_.z += velocity_.z;
-
-	/*position_.x += velocity_.x;
-	position_.y += velocity_.y*/;
 
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
