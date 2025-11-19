@@ -21,12 +21,8 @@ public:
 	void Update();
 	// 追尾
 	void HomingReticle();
-	// 描画
-	void Draw();
 	// UI描画
 	void DrawUI();
-	// (仮)上下左右を押したら標準を動かす のちにマウスで動かせるようにする
-	void InputMove();
 	// マウスの移動
 	void MouseMove();
 
