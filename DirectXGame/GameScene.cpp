@@ -11,31 +11,27 @@ void GameScene::Initialize() {
 
 	phase_ = Phase::kFadeIn;
 
+	// フェード
 	fade_ = new Fade();
 	fade_->Initialize();
-
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
-
+	//Model
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
-
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
-
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
-
 	modelDeath_ = Model::CreateFromOBJ("deathParticle", true);
-
 	modelLookOn_ = Model::CreateFromOBJ("cube", true);
-
 	// ブロック
 	modelBlock_ = Model::CreateFromOBJ("block", true);
 
 	skydome_ = new Skydome();
-
 	skydome_->Initialize(modelSkydome_, &camera_);
 
 	mapChipField_ = new MapChipField();
 	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
 	GenerateBlocks();
+
+	TextureManager::Load("lookOn.png");
 
 	// 自キャラの生成
 	player_ = new Player();
@@ -74,7 +70,6 @@ void GameScene::Initialize() {
 
 	// 自キャラの初期化
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
-
 	player_->SetMapChipField(mapChipField_);
 	
 	deathParticles_->Initialize(modelDeath_, &camera_, playerPosition);
@@ -84,10 +79,12 @@ void GameScene::Initialize() {
 	//デバッグ
 	debugCamera_ = new DebugCamera(1280, 720);
 
+	imGuiManager = ImGuiManager::GetInstance();
 	
 }
 
-void GameScene::GenerateBlocks() {
+void GameScene::GenerateBlocks() 
+{
 	uint32_t numBlockVirtical = mapChipField_->GetNumBlockVirtical();
 	uint32_t numBlockHorizontal = mapChipField_->GetNumBlockHorizontal();
 
@@ -132,7 +129,8 @@ GameScene::~GameScene()
 	delete lookOn_;
 }
 
-void GameScene::Update() {
+void GameScene::Update()
+{
 
 	ChangePhase();
 	
@@ -215,6 +213,14 @@ void GameScene::Update() {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
 
+	imGuiManager->Begin();
+
+	ImGui::Begin("mouse");
+	ImGui::SameLine();
+	ImGui::Text("mousePosX = %f,PosY = %f", lookOn_->GetMousePosX(),lookOn_->GetMousePosY());
+	ImGui::End();
+
+	imGuiManager->End();
 #endif // DEBUG
 
 	if (isDebugCameraActive_) {
@@ -283,7 +289,7 @@ void GameScene::Draw()
 			modelBlock_->Draw(*worldTransformBlock, camera_);
 		}
 	}
-	lookOn_->Draw();
+	//lookOn_->Draw();
 	skydome_->Draw();
 	if (deathParticles_) {
 		deathParticles_->Draw();
@@ -293,9 +299,13 @@ void GameScene::Draw()
 
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
-	//lookOn_->Draw();
+	lookOn_->DrawUI();
 
 	Sprite::PostDraw();
+
+	
+	imGuiManager->Draw();
+	
 
 	fade_->Draw();
 	

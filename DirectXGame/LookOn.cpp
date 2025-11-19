@@ -1,6 +1,5 @@
 #include "LookOn.h"
 #include "cassert"
-#include "MyMath.h"
 #include <numbers>
 #include "MapChipField.h"
 #include <algorithm>
@@ -8,8 +7,10 @@
 using namespace KamataEngine;
 using namespace MathUtility;
 
-void LookOn::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position) 
-{
+LookOn::~LookOn() 
+{ delete sprite2DReticle_; }
+
+void LookOn::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position) {
 	assert(model);
 	model_ = model;
 	worldTransform_.Initialize();
@@ -18,22 +19,74 @@ void LookOn::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera
 	camera_ = camera;
 
 	position_ = {position.x, position.y};
-	Vector4 collar = {1, 1, 1, 1};
-	int GH = TextureManager::Load("lookOn.png");
-	lookOnDraw = Sprite::Create(GH, {position_.x,position_.y}, collar, {0.0f, 0.0f}, false, false);
+	mousePosXY_ = {position_.x,position_.y};
+	mousePosZ_ = 0;
 
+	// レティクル用テクスチャ取得
+	uint32_t textureReticle = TextureManager::Load("lookOn.png");
+	// スプライト生成
+	sprite2DReticle_ = Sprite::Create(textureReticle, {640.0f,310.0f}, {1, 1, 1, 1}, {0.5f, 0.5f});
 }
 
 void LookOn::Update()
 {
-	InputMove(); 
+	//InputMove(); 
+	//MouseMove();
+
+	
+
 	WorldTransformUpdate();
+	HomingReticle();
+}
+
+void LookOn::HomingReticle()
+{
+	Vector3 positionReticle = GetWorldPosition(); 
+	Matrix4x4 matViewport = MakeViewportMatrix(0, 0, 1280.0f, 720.0f, 0, 1);
+	// ビュー行列とプロジェクション行列、ビューポート行列を合成
+	// AL3 03_14 p35
+	Matrix4x4 matViewProjectionViewport = camera_->matView * camera_->matProjection * matViewport;
+	// ワールド→Screen座標変換
+	positionReticle = Transform(positionReticle, matViewProjectionViewport);
+	sprite2DReticle_->SetPosition(Vector2(positionReticle.x, positionReticle.y));
+
+	POINT mousePosition;
+	// マウス座標(スクリーン座標)を取得する
+	GetCursorPos(&mousePosition);
+	// クライアントエリア座標に変換する
+	HWND hwnd = WinApp::GetInstance()->GetHwnd();
+	ScreenToClient(hwnd, &mousePosition);
+
+	// マウス座標を2Dレティクルのスプライトに代入する
+	sprite2DReticle_->SetPosition(Vector2(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y)));
+	// ビュープロジェクションビューポート合成行列
+	Matrix4x4 matVPV = camera_->matView * camera_->matProjection * matViewport;
+	// 合成行列の逆行列を計算する
+	Matrix4x4 matInverseVPV = Inverse(matVPV);
+	// スクリーン座標
+	Vector3 posNear = Vector3(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y), 0);
+	Vector3 posFar = Vector3(static_cast<float>(mousePosition.x), static_cast<float>(mousePosition.y), 1);
+	// スクリーン座標系からワールド座標系へ
+	posNear = Transform(posNear, matInverseVPV);
+	posFar = Transform(posFar, matInverseVPV);
+
+	// マウスレイの方向
+	Vector3 mouseDirection = posFar - posNear;
+	mouseDirection = Normalize(mouseDirection);
+
+	// カメラから照準オブジェクトの距離
+	const float kDistanceTestObject = 2.0f;
+	worldTransform_.translation_ = posNear + mouseDirection * kDistanceTestObject;
 }
 
 void LookOn::Draw() 
 { 
 	model_->Draw(worldTransform_, *camera_); 
-	//lookOnDraw->Draw();
+}
+
+void LookOn::DrawUI()
+{
+	sprite2DReticle_->Draw(); 
 }
 
 void LookOn::InputMove()
@@ -81,6 +134,14 @@ void LookOn::InputMove()
 	} else {
 		velocity_.y *= (1.0f - kAttenuation);
 	}
+}
+#include <iostream>
+void LookOn::MouseMove()
+{
+	mousePosXY_ = Input::GetInstance()->GetMousePosition(); 
+	std::cout << "mouse x" << mousePosXY_.x << ", " << mousePosXY_.y << std::endl;
+	mousePos_ = {mousePosXY_.x, mousePosXY_.y, mousePosZ_};
+	velocity_ += mousePos_;
 }
 
 void LookOn::WorldTransformUpdate()

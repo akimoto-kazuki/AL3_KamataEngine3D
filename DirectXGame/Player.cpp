@@ -10,6 +10,7 @@
 using namespace KamataEngine;
 using namespace MathUtility;
 
+
 void Player::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position) { 
 	
 	assert(model); 
@@ -18,6 +19,8 @@ void Player::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera
 	worldTransform_.translation_ = position;
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	camera_ = camera;
+
+	
 
 }
 
