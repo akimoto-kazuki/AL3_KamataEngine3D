@@ -20,7 +20,6 @@ void GameScene::Initialize() {
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 	modelDeath_ = Model::CreateFromOBJ("deathParticle", true);
-	modelLookOn_ = Model::CreateFromOBJ("cube", true);
 	// ブロック
 	modelBlock_ = Model::CreateFromOBJ("block", true);
 
@@ -74,7 +73,7 @@ void GameScene::Initialize() {
 	
 	deathParticles_->Initialize(modelDeath_, &camera_, playerPosition);
 
-	lookOn_->Initialize(modelLookOn_, &camera_, lookOnPosition);
+	lookOn_->Initialize(&camera_, lookOnPosition);
 
 	//デバッグ
 	debugCamera_ = new DebugCamera(1280, 720);
@@ -135,6 +134,14 @@ void GameScene::Update()
 	ChangePhase();
 	
 	fade_->Update();
+
+	enemies_.remove_if([](Enemy* enemy) {
+		if (enemy->IsDead()) {
+			delete enemy;
+			return true;
+		}
+		return false;
+	});
 
 	switch (phase_) {
 
@@ -202,7 +209,8 @@ void GameScene::Update()
 	player_->Update();
 	lookOn_->Update();
 	skydome_->Update();
-	for (Enemy* enemy : enemies_) {
+	for (Enemy* enemy : enemies_) 
+	{
 		enemy->Update();
 	}
 	cameraController_->Update();
@@ -312,10 +320,12 @@ void GameScene::Draw()
 
 void GameScene::CheckAllCollisions()
 {
-	#pragma region 自キャラと敵キャラの当たり判定
+	const std::list<PlayerBullet*>& playerBullets = player_->GetPlayerBullets();
 
 	// 判定対象1と2の座標
 	AABB aabb1, aabb2;
+
+	#pragma region 自キャラと敵キャラの当たり判定
 
 	// 自キャラの座標
 	aabb1 = player_->GetAABB();
@@ -334,15 +344,32 @@ void GameScene::CheckAllCollisions()
 		}
 	}
 
+	#pragma endregion
+
+	#pragma region 自弾と敵キャラの当たり判定
+
+	// 判定対象1と2の座標
+	AABB aabb3, aabb4;
+	for (Enemy* enemy : enemies_) 
+	{
+		aabb3 = enemy->GetAABB();
+		for (PlayerBullet* playerBullet : playerBullets)
+		{
+			aabb4 = playerBullet->GetAABB();
+
+			if (IsCollision(aabb3, aabb4))
+			{
+				enemy->OnCollision(playerBullet);
+
+				playerBullet->OnCollision(enemy);
+			}
+		}
+	}
+	
 
 	#pragma endregion
 
 	#pragma region 自キャラとアイテムの当たり判定
-
-
-	#pragma endregion
-
-	#pragma region 自弾と敵キャラの当たり判定
 
 	#pragma endregion
 

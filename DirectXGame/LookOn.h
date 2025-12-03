@@ -16,7 +16,7 @@ class LookOn
 public:
 	~LookOn();
 	// 初期化
-	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position);
+	void Initialize(KamataEngine::Camera* camera, KamataEngine::Vector3& position);
 	// 更新
 	void Update();
 	// 追尾
@@ -40,7 +40,6 @@ private:
 	KamataEngine::Sprite* sprite2DReticle_ = nullptr;
 
 	KamataEngine::WorldTransform worldTransform_;
-	KamataEngine::Model* model_ = nullptr;
 	KamataEngine::Camera* camera_ = nullptr;
 	uint32_t textureHandle_ = 0u;
 

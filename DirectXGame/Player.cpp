@@ -11,6 +11,14 @@ using namespace KamataEngine;
 using namespace MathUtility;
 
 
+Player::~Player() 
+{
+	for (PlayerBullet*playerBullet: playerBullets_) 
+	{
+		delete playerBullet;
+	}
+}
+
 void Player::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position) { 
 	
 	assert(model); 
@@ -20,14 +28,28 @@ void Player::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
 	camera_ = camera;
 
-	
-
 }
 
-void Player::Update() {
+void Player::Update() 
+{
+	playerBullets_.remove_if([](PlayerBullet* playerBullet)
+	{
+		if (playerBullet->IsDead())
+		{
+			delete playerBullet;
+			return true;
+		}
+		return false;
+	});
+	
 
 	// 1 移動入力
 	InputMove();
+	Attack();
+	for (PlayerBullet* playerBullet:playerBullets_ ) 
+	{
+		playerBullet->Update();
+	}
 	// 2 移動量を加味して衝突判定
 	// 衝突情報の初期化
 	CollisionMapInfo collisionMapInfo;
@@ -48,6 +70,15 @@ void Player::Update() {
 	// 回転アニメーション
 	AnimateTurn();
 
+}
+
+void Player::Draw() 
+{
+	model_->Draw(worldTransform_, *camera_); 
+	for (PlayerBullet* playerBullet : playerBullets_) 
+	{
+		playerBullet->Draw(*camera_);
+	}
 }
 
 void Player::InputMove() 
@@ -103,6 +134,28 @@ void Player::InputMove()
 	{
 		velocity_ += KamataEngine::Vector3(0, -kGravityAcceleration, 0);
 		velocity_.y = std::max(velocity_.y, -kLimitFallSpeed);
+	}
+}
+
+void Player::Attack()
+{
+	if (shotCoolTime >= 0)
+	{
+		shotCoolTime -= 0.1f;
+	}
+	if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE))
+	{	
+		if (shotCoolTime < 0)
+		{
+			const float kBulletSpeed = 0.1f;
+			Vector3 veloctiy = {kBulletSpeed, 0.0f, 0.0f};
+			PlayerBullet* newBullet = new PlayerBullet();
+			newBullet->Initialize(model_, worldTransform_.translation_, veloctiy);
+
+			playerBullets_.push_back(newBullet);
+			shotCoolTime = 1.0f;
+		}
+		
 	}
 }
 
@@ -452,10 +505,3 @@ void Player::MapHitCheck(CollisionMapInfo& info)
 	MapHitCheckRight(info);
 	MapHitCheckLeft(info);
 }
-
-void Player::Draw() 
-{
-	model_->Draw(worldTransform_, *camera_); 
-}
-
-

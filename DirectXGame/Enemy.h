@@ -6,9 +6,29 @@
 #include <vector>
 
 class Player;
+class PlayerBullet;
 
 class Enemy 
 {
+
+public:
+	// 初期化
+	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position);
+	// 更新
+	void Update();
+	// 描画
+	void Draw();
+
+	KamataEngine::Vector3 GetWorldPosition();
+
+	AABB GetAABB();
+
+	void OnCollision(const Player* player);
+
+	void OnCollision(const PlayerBullet* playerBullet);
+
+	bool IsDead() const { return isDead_; }
+
 private:
 
 	KamataEngine::WorldTransform worldTransform_;
@@ -31,18 +51,5 @@ private:
 	// 経過時間
 	float walkTimer_ = 0.0f;
 
-public:
-	// 初期化
-	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position);
-	// 更新
-	void Update();
-	// 描画
-	void Draw();
-
-	KamataEngine::Vector3 GetWorldPosition();
-
-	AABB GetAABB();
-
-	void OnCollision(const Player* player);
-
+	bool isDead_ = false;
 };

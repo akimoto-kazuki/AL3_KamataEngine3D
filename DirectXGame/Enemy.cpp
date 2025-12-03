@@ -75,3 +75,9 @@ void Enemy::OnCollision(const Player* player)
 {
 	(void)player; 
 }
+
+void Enemy::OnCollision(const PlayerBullet* playerBullet)
+{
+	(void)playerBullet; 
+	isDead_ = true;
+}
