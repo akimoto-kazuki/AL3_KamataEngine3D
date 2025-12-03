@@ -10,9 +10,7 @@ using namespace MathUtility;
 LookOn::~LookOn() 
 { delete sprite2DReticle_; }
 
-void LookOn::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position) {
-	assert(model);
-	model_ = model;
+void LookOn::Initialize(KamataEngine::Camera* camera, KamataEngine::Vector3& position) {
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
@@ -31,6 +29,7 @@ void LookOn::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera
 
 void LookOn::Update()
 {
+	//MouseMove();
 	WorldTransformUpdate();
 	HomingReticle();
 }

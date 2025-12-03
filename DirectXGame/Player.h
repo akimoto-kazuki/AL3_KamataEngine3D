@@ -1,13 +1,16 @@
 #pragma once
 #include "KamataEngine.h"
 #include "MyMath.h"
+#include "PlayerBullet.h"
 
 #include <vector>
+#include <list>
+
 
 class MapChipField;
 
 class Enemy;
-
+class PlayerBullet;
 //自キャラ
 class Player 
 {
@@ -35,14 +38,16 @@ class Player
 
 
 public:
+	~Player();
 	// 初期化
-	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position);
+	void Initialize(KamataEngine::Model* model,  KamataEngine::Camera* camera, KamataEngine::Vector3& position);
 	// 更新
 	void Update();
 	// 描画
 	void Draw();
 	// 1 移動入力
 	void InputMove();
+	void Attack();
 	// 2 移動量を加味して衝突判定する
 	// 上方向
 	void MapHitCheckUP(CollisionMapInfo& info);
@@ -73,6 +78,8 @@ public:
 
 	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
 
+	KamataEngine::Vector3 GetPlayerPosition() const { return worldTransform_.translation_; }
+
 	KamataEngine::Vector3 GetWorldPosition();
 
 	AABB GetAABB();
@@ -83,16 +90,18 @@ public:
 
 	bool IsDead() const { return isDead_; }
 
-
+	const std::list<PlayerBullet*>& GetPlayerBullets() const { return playerBullets_; }
 
 private:
-
-	
 
 	KamataEngine::WorldTransform worldTransform_;
 	KamataEngine::Model* model_ = nullptr;
 	KamataEngine::Camera* camera_ = nullptr;
+	std::list<PlayerBullet*> playerBullets_;
+	PlayerBullet* playerBullet_ = nullptr;
 	uint32_t textureHandle_ = 0u;
+
+	float shotCoolTime = 0.0f;
 
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformPlayer_;
 	

@@ -116,6 +116,7 @@
     <ClCompile Include="MyMath.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="LookOn.cpp" />
+    <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="Skydome.cpp" />
     <ClCompile Include="TitleScene.cpp" />
   </ItemGroup>
@@ -204,6 +205,7 @@
     <ClInclude Include="MyMath.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="LookOn.h" />
+    <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="Skydome.h" />
     <ClInclude Include="TitleScene.h" />
   </ItemGroup>
