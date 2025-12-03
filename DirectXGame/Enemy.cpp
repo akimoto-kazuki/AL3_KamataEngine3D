@@ -36,8 +36,6 @@ void Enemy::Update()
 	float degree = kWalkMotionAngleStart + kWalkMotionAngleEnd * (param + 1.0f) / 2.0f;
 	worldTransform_.rotation_.x = std::*/
 
-
-
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
 	
@@ -58,7 +56,6 @@ KamataEngine::Vector3 Enemy::GetWorldPosition() {
 
 	return worldPos;
 }
-
 
 AABB Enemy::GetAABB() {
 	KamataEngine::Vector3 worldPos = GetWorldPosition();
