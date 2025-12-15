@@ -8,13 +8,15 @@
 using namespace KamataEngine;
 using namespace MathUtility;
 // 初期化
-void PlayerBullet::Initialize(KamataEngine::Model* model, const KamataEngine::Vector3& position, const KamataEngine::Vector3& velocity) {
+void PlayerBullet::Initialize
+(KamataEngine::Model* model, const KamataEngine::Vector3& position, const KamataEngine::Vector3& velocity, const float theta) {
 	assert(model);
 	model_ = model;
 	textureHandle_ = TextureManager::Load("white1x1.png");
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
+	worldTransform_.rotation_.z = -theta;
 	velocity_ = velocity;
 }
 // 更新

@@ -45,6 +45,8 @@ private:
 
 	KamataEngine::Vector3 velocity_ = {};
 
+	float DistanceTestObject;
+
 	static inline const float kAcceleration = 0.2f;
 
 	static inline const float kAttenuation = 0.2f;
