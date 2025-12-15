@@ -11,7 +11,7 @@ class PlayerBullet
 {
 public:
 	// 初期化
-	void Initialize(KamataEngine::Model* model, const KamataEngine::Vector3& position, const KamataEngine::Vector3& velocity);
+	void Initialize(KamataEngine::Model* model, const KamataEngine::Vector3& position, const KamataEngine::Vector3& velocity, const float theta);
 	// 更新
 	void Update();
 	// 描画
@@ -38,7 +38,7 @@ private:
 	uint32_t textureHandle_ = 0u;
 	KamataEngine::Vector3 velocity_ = {};
 	
-	static const int32_t kLifeTime = 60 * 5;
+	static const int32_t kLifeTime = 60 * 3;
 	int32_t deathTimer_ = kLifeTime;
 	bool isDead_ = false;
 

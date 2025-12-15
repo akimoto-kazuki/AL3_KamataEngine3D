@@ -8,7 +8,7 @@
 
 
 class MapChipField;
-
+class LookOn;
 class Enemy;
 class PlayerBullet;
 //自キャラ
@@ -92,6 +92,8 @@ public:
 
 	const std::list<PlayerBullet*>& GetPlayerBullets() const { return playerBullets_; }
 
+	void SetLookOn(LookOn* lookOn) {lookOn_ = lookOn;}
+
 private:
 
 	KamataEngine::WorldTransform worldTransform_;
@@ -100,6 +102,8 @@ private:
 	std::list<PlayerBullet*> playerBullets_;
 	PlayerBullet* playerBullet_ = nullptr;
 	uint32_t textureHandle_ = 0u;
+
+	LookOn* lookOn_ = nullptr;
 
 	float shotCoolTime = 0.0f;
 

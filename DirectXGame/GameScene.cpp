@@ -69,6 +69,7 @@ void GameScene::Initialize() {
 
 	// 自キャラの初期化
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
+	player_->SetLookOn(lookOn_);
 	player_->SetMapChipField(mapChipField_);
 	
 	deathParticles_->Initialize(modelDeath_, &camera_, playerPosition);
@@ -226,6 +227,7 @@ void GameScene::Update()
 	ImGui::Begin("mouse");
 	ImGui::SameLine();
 	ImGui::Text("mousePosX = %f,PosY = %f", lookOn_->GetMousePosX(),lookOn_->GetMousePosY());
+	ImGui::Text("mousePosX = %f,PosY = %f,PosZ = %f", lookOn_->GetWorldPosition().x, lookOn_->GetWorldPosition().y, lookOn_->GetWorldPosition().z);
 	ImGui::End();
 
 	imGuiManager->End();

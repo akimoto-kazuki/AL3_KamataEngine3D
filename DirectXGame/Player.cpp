@@ -3,9 +3,12 @@
 #include "Player.h"
 #include "cassert"
 #include "MyMath.h"
+#include "LookOn.h"
 #include <numbers>
 #include "MapChipField.h"
 #include <algorithm>
+#include <cassert>
+
 
 using namespace KamataEngine;
 using namespace MathUtility;
@@ -123,7 +126,7 @@ void Player::InputMove()
 			velocity_.x *= (1.0f - kAttenuation);
 		}
 
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_W)) 
+		if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) 
 		{
 			velocity_ += KamataEngine::Vector3(0, kJumpAcceleration, 0);
 			
@@ -141,16 +144,26 @@ void Player::Attack()
 {
 	if (shotCoolTime >= 0)
 	{
-		shotCoolTime -= 0.1f;
+		shotCoolTime -= 0.05f;
 	}
-	if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE))
+	if (KamataEngine::Input::GetInstance()->IsPressMouse(0))
 	{	
 		if (shotCoolTime < 0)
 		{
+			assert(lookOn_);
+
 			const float kBulletSpeed = 0.1f;
-			Vector3 veloctiy = {kBulletSpeed, 0.0f, 0.0f};
+
+			Vector3 player = GetWorldPosition();
+			Vector3 lookOn = lookOn_->GetWorldPosition();
+			Vector3 route = lookOn - player;
+			route = Normalize(route);
+			Vector3 veloctiy = {(route.x * kBulletSpeed), (route.y * kBulletSpeed), 0.0f};
+
+			float theta = std::atan2(route.y, route.x);
+
 			PlayerBullet* newBullet = new PlayerBullet();
-			newBullet->Initialize(model_, worldTransform_.translation_, veloctiy);
+			newBullet->Initialize(model_, worldTransform_.translation_, veloctiy,theta);
 
 			playerBullets_.push_back(newBullet);
 			shotCoolTime = 1.0f;

@@ -20,6 +20,8 @@ void LookOn::Initialize(KamataEngine::Camera* camera, KamataEngine::Vector3& pos
 	mousePosXY_ = {position_.x,position_.y};
 	mousePosZ_ = 0;
 
+	DistanceTestObject = 0;
+
 	// レティクル用テクスチャ取得
 	uint32_t textureReticle = TextureManager::Load("lookOn.png");
 	// スプライト生成
@@ -70,8 +72,9 @@ void LookOn::HomingReticle()
 	mouseDirection = Normalize(mouseDirection);
 
 	// カメラから照準オブジェクトの距離
-	const float kDistanceTestObject = 2.0f;
-	worldTransform_.translation_ = posNear + mouseDirection * kDistanceTestObject;
+	const float kDistanceTestObject = 17.0f;
+	DistanceTestObject = kDistanceTestObject - worldTransform_.translation_.z;
+	worldTransform_.translation_ = posNear + mouseDirection * DistanceTestObject;
 }
 
 void LookOn::DrawUI()
