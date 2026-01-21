@@ -18,32 +18,30 @@ void Enemy::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera,
 	worldTransform_.translation_ = position;
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / -2.0f;
 	camera_ = camera;
-	velocity_ = {-kWalkSpeed, 0, 0};
-	walkTimer_ = 0.0f;
+	hitTimer_ = 0.0f;
 }
 
 void Enemy::Update() 
 {
-
-	worldTransform_.translation_ += velocity_;
-
-	walkTimer_ += 1.0f / 20.0f;
-
-	// 回転アニメーション
-	worldTransform_.rotation_.x = std::sin(walkTimer_);
-
-	/*float param = std::sin(walkTimer_);
-	float degree = kWalkMotionAngleStart + kWalkMotionAngleEnd * (param + 1.0f) / 2.0f;
-	worldTransform_.rotation_.x = std::*/
-
+	if (isHit_)
+	{
+		hitTimer_ += 1.0f;
+	}
+	if (hitTimer_ >= 30.0f)
+	{
+		isDead_ = true;
+	}
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
-	
+
 }
 
 void Enemy::Draw() 
 {
-	model_->Draw(worldTransform_, *camera_);
+	if (!isHit_ || int(hitTimer_) % 2 == 1)
+	{
+		model_->Draw(worldTransform_, *camera_);
+	}
 }
 
 KamataEngine::Vector3 Enemy::GetWorldPosition() {
@@ -68,13 +66,8 @@ AABB Enemy::GetAABB() {
 	return aabb;
 }
 
-void Enemy::OnCollision(const Player* player) 
-{
-	(void)player; 
-}
-
 void Enemy::OnCollision(const PlayerBullet* playerBullet)
 {
 	(void)playerBullet; 
-	isDead_ = true;
+	isHit_ = true;
 }

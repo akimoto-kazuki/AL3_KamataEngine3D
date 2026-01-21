@@ -40,7 +40,7 @@ class Player
 public:
 	~Player();
 	// 初期化
-	void Initialize(KamataEngine::Model* model,  KamataEngine::Camera* camera, KamataEngine::Vector3& position);
+	void Initialize(KamataEngine::Model* model, KamataEngine::Model* bulletModel, KamataEngine::Camera* camera, KamataEngine::Vector3& position);
 	// 更新
 	void Update();
 	// 描画
@@ -84,12 +84,6 @@ public:
 
 	AABB GetAABB();
 
-	void OnCollision(const Enemy* enemy);
-
-	bool isDead_ = false;
-
-	bool IsDead() const { return isDead_; }
-
 	const std::list<PlayerBullet*>& GetPlayerBullets() const { return playerBullets_; }
 
 	void SetLookOn(LookOn* lookOn) {lookOn_ = lookOn;}
@@ -98,6 +92,7 @@ private:
 
 	KamataEngine::WorldTransform worldTransform_;
 	KamataEngine::Model* model_ = nullptr;
+	KamataEngine::Model* bulletModel_ = nullptr;
 	KamataEngine::Camera* camera_ = nullptr;
 	std::list<PlayerBullet*> playerBullets_;
 	PlayerBullet* playerBullet_ = nullptr;

@@ -1,5 +1,7 @@
 #include "GameScene.h"
 #include "MyMath.h"
+#include <algorithm>
+#include <cassert>
 
 using namespace KamataEngine;
 
@@ -19,7 +21,7 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
 	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
-	modelDeath_ = Model::CreateFromOBJ("deathParticle", true);
+	modelShot_ = Model::CreateFromOBJ("bullet", true);
 	// ブロック
 	modelBlock_ = Model::CreateFromOBJ("block", true);
 
@@ -33,26 +35,8 @@ void GameScene::Initialize() {
 	TextureManager::Load("lookOn.png");
 
 	// 自キャラの生成
-	player_ = new Player();
 
 	lookOn_ = new LookOn();
-
-	deathParticles_ = new DeathParticles();
-
-	unsigned int currentTime = unsigned int(time(nullptr));
-	srand(currentTime);
-
-	countMin = 30;
-	isCountDown = true;
-
-	for (int32_t i = 0; i < enemySpoon; ++i) 
-	{
-		Enemy* newEnemy = new Enemy();
-		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(20 + (5 * i), (rand() % 11 + 8));
-		newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
-
-		enemies_.push_back(newEnemy);
-	}
 
 	// カメラ
 	cameraController_ = new CameraController();
@@ -62,18 +46,10 @@ void GameScene::Initialize() {
 	CameraController::Rect cameraArea = {12.0f, (100 - 12.0f), 6.0f, 6.0f};
 	cameraController_->SetMovableArea(cameraArea);
 	
-	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
 	Vector3 lookOnPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
 
-	//Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(18, 18);
-
-	// 自キャラの初期化
-	player_->Initialize(modelPlayer_, &camera_, playerPosition);
+	// 照準オブジェクトの初期化
 	player_->SetLookOn(lookOn_);
-	player_->SetMapChipField(mapChipField_);
-	
-	deathParticles_->Initialize(modelDeath_, &camera_, playerPosition);
-
 	lookOn_->Initialize(&camera_, lookOnPosition);
 
 	//デバッグ
@@ -90,17 +66,64 @@ void GameScene::GenerateBlocks()
 
 	worldTransformBlocks_.resize(numBlockVirtical);
 
-	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
+	for (uint32_t i = 0; i < numBlockVirtical; ++i) 
+	{
 		worldTransformBlocks_[i].resize(numBlockHorizontal);
 	}
 
-	for (uint32_t i = 0; i < numBlockVirtical; ++i) {
-		for (uint32_t j = 0; j < numBlockHorizontal; ++j) {
-			if (mapChipField_->GetMapChipTypeByIndex(j, i) == MapChipType::kBlock) {
-				WorldTransform* worldTransform = new WorldTransform();
+	for (uint32_t y = 0; y < numBlockVirtical; ++y) 
+	{
+		for (uint32_t x = 0; x < numBlockHorizontal; ++x)
+		{
+			MapChipType mapChipType;
+			uint8_t subID;
+			mapChipType = mapChipField_->GetMapChipTypeByIndex(x, y);
+			WorldTransform* worldTransform = nullptr;
+			// プレイヤー
+			Vector3 playerPos;
+			Vector3 enemyPos;
+
+			switch (mapChipType) 
+			{
+			case MapChipType::kBlank:
+				break;
+			case MapChipType::kBlock: 
+			{
+				worldTransform = new WorldTransform();
 				worldTransform->Initialize();
-				worldTransformBlocks_[i][j] = worldTransform;
-				worldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j, i);
+				worldTransformBlocks_[y][x] = worldTransform;
+				worldTransformBlocks_[y][x]->translation_ = mapChipField_->GetMapChipPositionByIndex(x, y);
+			}
+				break;
+			case MapChipType::kPlayer:
+			{
+				assert(player_ == nullptr && "自キャラを2重に配置しようとしています");
+				// プレイヤー
+				player_ = new Player();
+				// リスポーン地点
+				playerPos = mapChipField_->GetMapChipPositionByIndex(x, y);
+				// 初期化の置き場
+				player_->Initialize(modelPlayer_, modelShot_, &camera_, playerPos);
+				// マップチップ読み込み
+				player_->SetMapChipField(mapChipField_);
+			}
+				break;
+			case MapChipType::kEnemy:
+			{
+				subID = mapChipField_->GetMapChipSubIDByIndex(x, y);
+				switch (subID)
+				{
+				case 0:
+					Enemy* newEnemy = new Enemy();
+					enemyPos = mapChipField_->GetMapChipPositionByIndex(x,y);
+					newEnemy->Initialize(modelEnemy_, &camera_, enemyPos);
+
+					enemies_.push_back(newEnemy);
+					break;
+				
+				}
+			}
+				break;
 			}
 		}
 	}
@@ -124,15 +147,12 @@ GameScene::~GameScene()
 	delete modelSkydome_;
 	delete mapChipField_;
 	delete cameraController_;
-	delete deathParticles_;
 	delete fade_;
 	delete lookOn_;
 }
 
 void GameScene::Update()
 {
-
-	ChangePhase();
 	
 	fade_->Update();
 
@@ -148,41 +168,11 @@ void GameScene::Update()
 
 	case GameScene::Phase::kPlay:
 		CheckAllCollisions();
-		if (isCountDown)
-		{
-			countTimer++;
-			if (countTimer >= 59)
-			{
-				countTimer = 0;
-				countMin-=1;
-			}
-			if (countMin <= 0)
-			{
-				phase_ = Phase::kClearFadeOut;
-			}
-		}
-		if (player_->IsDead() == true) 
-		{
-			phase_ = Phase::kDeath;
-			const Vector3& deathParticlesPosition = player_->GetWorldPosition();
-			deathParticles_ = new DeathParticles;
-			deathParticles_->Initialize(modelDeath_, &camera_, deathParticlesPosition);
-		};
 		if (KamataEngine::Input::GetInstance()->PushKey(DIK_R))
 		{
 			finished_ = true;
 		}
 		
-		break;
-
-	case GameScene::Phase::kDeath:
-		isCountDown = false;
-		deathParticles_->Update();
-		if (deathParticles_ && deathParticles_->IsFinished()) 
-		{
-			phase_ = Phase::kFadeOut;
-			fade_->Start(Fade::Status::FadeOut, 1.0f);
-		}
 		break;
 	case GameScene::Phase::kFadeIn:
 		fade_->Update();
@@ -196,12 +186,6 @@ void GameScene::Update()
 		fade_->Update();
 		if (fade_->IsFinished()) {
 			finished_ =  true;
-		}
-		break;
-	case GameScene::Phase::kClearFadeOut:
-		fade_->Update();
-		if (fade_->IsFinished()) {
-			finished_ = true;
 		}
 		break;
 
@@ -256,35 +240,11 @@ void GameScene::Update()
 	
 }
 
-void GameScene::ChangePhase() {
-
-	switch (phase_) {
-
-	case GameScene::Phase::kPlay:
-		if (player_->isDead_)
-		{
-			phase_ = Phase::kDeath;
-
-			const Vector3& deathParticlesPosition = player_->GetWorldPosition();
-
-			deathParticles_->Initialize(modelDeath_, &camera_, deathParticlesPosition);
-		}
-		break;
-
-	case GameScene::Phase::kDeath:
-		if (deathParticles_ && deathParticles_->IsFinished()) {
-			finished_ = true;
-		}
-		break;
-	}
-	
-}
-
 void GameScene::Draw() 
 {
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	Model::PreDraw(dxCommon->GetCommandList());
-	if (phase_ == Phase::kPlay || phase_ == Phase::kFadeIn || phase_ == Phase::kClearFadeOut) 
+	if (phase_ == Phase::kPlay || phase_ == Phase::kFadeIn) 
 	{
 		player_->Draw();
 	}
@@ -300,9 +260,6 @@ void GameScene::Draw()
 		}
 	}
 	skydome_->Draw();
-	if (deathParticles_) {
-		deathParticles_->Draw();
-	}
 
 	Model::PostDraw();
 
@@ -320,59 +277,31 @@ void GameScene::Draw()
 	
 }
 
-void GameScene::CheckAllCollisions()
-{
+void GameScene::CheckPlayerBulletEnemy()
+{ 
 	const std::list<PlayerBullet*>& playerBullets = player_->GetPlayerBullets();
 
 	// 判定対象1と2の座標
 	AABB aabb1, aabb2;
+	for (Enemy* enemy : enemies_) {
+		aabb1 = enemy->GetAABB();
+		for (PlayerBullet* playerBullet : playerBullets) {
+			aabb2 = playerBullet->GetAABB();
 
-	#pragma region 自キャラと敵キャラの当たり判定
-
-	// 自キャラの座標
-	aabb1 = player_->GetAABB();
-
-	// 自キャラと敵弾全ての当たり判定
-	for (Enemy* enemy : enemies_)
-	{
-		aabb2 = enemy->GetAABB();
-		
-		// AABB同士の交差判定
-		if (IsCollision(aabb1,aabb2))
-		{
-			player_->OnCollision(enemy);
-
-			enemy->OnCollision(player_);
-		}
-	}
-
-	#pragma endregion
-
-	#pragma region 自弾と敵キャラの当たり判定
-
-	// 判定対象1と2の座標
-	AABB aabb3, aabb4;
-	for (Enemy* enemy : enemies_) 
-	{
-		aabb3 = enemy->GetAABB();
-		for (PlayerBullet* playerBullet : playerBullets)
-		{
-			aabb4 = playerBullet->GetAABB();
-
-			if (IsCollision(aabb3, aabb4))
-			{
+			if (IsCollision(aabb1, aabb2)) {
 				enemy->OnCollision(playerBullet);
 
 				playerBullet->OnCollision(enemy);
 			}
 		}
 	}
-	
+}
 
-	#pragma endregion
+void GameScene::CheckAllCollisions()
+{
 
-	#pragma region 自キャラとアイテムの当たり判定
-
-	#pragma endregion
-
+	// プレイヤーの弾が敵に当たった時(倒す)
+	CheckPlayerBulletEnemy();
+	// プレイヤーの弾が壊せるブロックに当たった時
+	//CheckPlayerBulletBreakBlock();
 }

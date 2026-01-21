@@ -8,13 +8,12 @@
 
 namespace 
 {
-
-    std::map<std::string, MapChipType> mapChipTable = 
+    std::map<char, MapChipType> MapChipTypeTable =
     {
-        {"0", MapChipType::kBlank},
-        {"1", MapChipType::kBlock},
+        {'B',MapChipType::kBlock},
+        {'P',MapChipType::kPlayer},
+        {'E',MapChipType::kEnemy},
     };
-
 }
 
     MapChipType MapChipField::GetMapChipTypeByIndex(uint32_t xIndex, uint32_t yIndex) 
@@ -28,12 +27,22 @@ namespace
         {
 		    return MapChipType::kBlank;
 	    }
-	    return mapChipData_.data[yIndex][xIndex];
+	    return mapChipData_.data[yIndex][xIndex].type;
+    }
+    
+    uint8_t MapChipField::GetMapChipSubIDByIndex(uint32_t xIndex, uint32_t yIndex) 
+    {
+	    return mapChipData_.data[yIndex][xIndex].subID;
     }
 
     KamataEngine::Vector3 MapChipField::GetMapChipPositionByIndex(uint32_t xIndex, uint32_t yIndex) 
     {
         return KamataEngine::Vector3(kBlockWidth * xIndex,kBlockHeight * (kNumBlockVirtical - 1 - yIndex),0); 
+    }
+
+    MapChipDataUnit MapChipField::GetMapChipDataUnit(uint32_t xIndex, uint32_t yIndex) 
+    { 
+        return mapChipData_.data[yIndex][xIndex];
     }
 
     MapChipField::IndexSet MapChipField::GetMapChipIndexSetByPosition(const KamataEngine::Vector3& position) 
@@ -63,7 +72,7 @@ namespace
     { 
         mapChipData_.data.clear();
 	    mapChipData_.data.resize(kNumBlockVirtical);
-	    for (std::vector<MapChipType>& mapChipDataLine:mapChipData_.data)
+	    for (std::vector<MapChipDataUnit>& mapChipDataLine:mapChipData_.data)
         {
 		    mapChipDataLine.resize(kNumBlockHorizontal);
 	    }
@@ -92,10 +101,24 @@ namespace
             {
 			    std::string word;
 			    getline(line_stream, word, ',');
-			    if (mapChipTable.contains(word)) 
+                // 空白の場合スキップ
+			    if (word.empty())
                 {
-				    mapChipData_.data[i][j] = mapChipTable[word];
+				    continue;
 			    }
+                // 先頭文字がいずれかのマップチップ種別に該当するか確認
+			    if (!MapChipTypeTable.contains(word[kChipType]))
+                {
+				    continue;
+			    }
+			    mapChipData_.data[i][j].type = MapChipTypeTable[word[kChipType]];
+
+                if (word.size() <= kChipSubID) 
+                {
+				    continue;
+			    }
+
+                mapChipData_.data[i][j].subID = static_cast<uint8_t>(word[kChipSubID] - '0');
             }
 
 	    }

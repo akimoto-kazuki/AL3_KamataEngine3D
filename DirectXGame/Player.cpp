@@ -22,10 +22,12 @@ Player::~Player()
 	}
 }
 
-void Player::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, KamataEngine::Vector3& position) { 
+void Player::Initialize(KamataEngine::Model* model, KamataEngine::Model* bulletModel,KamataEngine::Camera* camera, KamataEngine::Vector3& position ) { 
 	
-	assert(model); 
+	assert(model);
+	assert(bulletModel);
 	model_ = model;
+	bulletModel_ = bulletModel;
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
 	worldTransform_.rotation_.y = std::numbers::pi_v<float> / 2.0f;
@@ -163,7 +165,7 @@ void Player::Attack()
 			float theta = std::atan2(route.y, route.x);
 
 			PlayerBullet* newBullet = new PlayerBullet();
-			newBullet->Initialize(model_, worldTransform_.translation_, veloctiy,theta);
+			newBullet->Initialize(bulletModel_, worldTransform_.translation_, veloctiy,theta);
 
 			playerBullets_.push_back(newBullet);
 			shotCoolTime = 1.0f;
@@ -208,7 +210,7 @@ void Player::MapHitCheckUP(CollisionMapInfo& info) {
 	indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionsNew[kLeftTop]);
 	mapChipType = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex);
 	mapChipTypeNext = mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex + 1);
-	if (mapChipType == MapChipType::kBlock && mapChipTypeNext != MapChipType::kBlock)
+	if (mapChipType == MapChipDataUnit(MapChipType::kBlock).type && mapChipTypeNext != MapChipType::kBlock)
 	{
 		hit = true;
 	}
@@ -394,7 +396,8 @@ void Player::CheckMapCeiling(const CollisionMapInfo& info)
 }
 
 // 5 壁の当たり判定
-void Player::HitWall(const CollisionMapInfo& info) {
+void Player::HitWall(const CollisionMapInfo& info)
+{
 	if (info.hitWall) {
 		velocity_.x *= (1.0f - kAttenuationWall);
 	}
@@ -503,12 +506,6 @@ AABB Player::GetAABB()
 
 	return aabb;
 
-}
-
-void Player::OnCollision(const Enemy* enemy)
-{ 
-	(void)enemy;
-	isDead_ = true;
 }
 
 void Player::MapHitCheck(CollisionMapInfo& info) 
