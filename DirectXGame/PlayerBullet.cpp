@@ -78,4 +78,5 @@ void PlayerBullet::OnCollision(const Enemy* enemy)
 {
 	(void)enemy;
 	isDead_ = true;
+	worldTransform_.translation_ = {10000.0f, 10000.0f, 0.0f};
 }

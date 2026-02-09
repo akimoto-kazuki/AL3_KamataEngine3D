@@ -38,7 +38,7 @@ private:
 	uint32_t textureHandle_ = 0u;
 	KamataEngine::Vector3 velocity_ = {};
 	
-	static const int32_t kLifeTime = 60 * 3;
+	static const int32_t kLifeTime = 30 ;
 	int32_t deathTimer_ = kLifeTime;
 	bool isDead_ = false;
 

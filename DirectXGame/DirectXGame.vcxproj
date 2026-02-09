@@ -106,7 +106,9 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BGMSet.cpp" />
     <ClCompile Include="CameraController.cpp" />
+    <ClCompile Include="Clear.cpp" />
     <ClCompile Include="DeathParticles.cpp" />
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="Fade.cpp" />
@@ -114,11 +116,14 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapChipField.cpp" />
     <ClCompile Include="MyMath.cpp" />
+    <ClCompile Include="Over.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="LookOn.cpp" />
     <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="Skydome.cpp" />
+    <ClCompile Include="Time.cpp" />
     <ClCompile Include="TitleScene.cpp" />
+    <ClCompile Include="Tutorial.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\TerrainPS.hlsl">
@@ -196,18 +201,23 @@
     <None Include="Resources\shaders\Sprite.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BGMSet.h" />
     <ClInclude Include="CameraController.h" />
+    <ClInclude Include="Clear.h" />
     <ClInclude Include="DeathParticles.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Fade.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="MapChipField.h" />
     <ClInclude Include="MyMath.h" />
+    <ClInclude Include="Over.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="LookOn.h" />
     <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="Skydome.h" />
+    <ClInclude Include="Time.h" />
     <ClInclude Include="TitleScene.h" />
+    <ClInclude Include="Tutorial.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

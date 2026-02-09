@@ -23,8 +23,6 @@ public:
 
 	AABB GetAABB();
 
-	void OnCollision(const Player* player);
-
 	void OnCollision(const PlayerBullet* playerBullet);
 
 	bool IsDead() const { return isDead_; }
@@ -38,18 +36,10 @@ private:
 
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformEnemy_;
 
-	KamataEngine::Vector3 velocity_ = {};
-
-	// 敵の移動速度
-	static inline const float kWalkSpeed = 0.05f;
-	// 最初の角度[度]
-	static inline const float kWalkMotionAngleStart = 1.0f;
-	// 最後の角度[度]
-	static inline const float kWalkMotionAngleEnd = 1.0f;
-	// アニメーションの周期となる時間
-	static inline const float kWalkMotionTime = 1.0f;
-	// 経過時間
-	float walkTimer_ = 0.0f;
-
 	bool isDead_ = false;
+
+	// 当たった時の演出
+	bool isHit_ = false;
+	float hitTimer_;
+
 };

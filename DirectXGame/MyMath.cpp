@@ -1,6 +1,8 @@
 #include "MyMath.h"
 #include <cmath>
 #include <numbers>
+#include <algorithm>
+#include "cassert"
 
 using namespace KamataEngine;
 using namespace MathUtility;
