@@ -2,11 +2,14 @@
 #include "MyMath.h"
 #include <algorithm>
 #include <cassert>
+#include "Player.h"
+#include "Enemy.h"
+#include "Time.h"
 
 using namespace KamataEngine;
 
-
-void GameScene::Initialize() {
+void GameScene::Initialize(Time* timer)
+{
 	
 	model_ = Model::Create();
 	camera_.Initialize();
@@ -32,6 +35,9 @@ void GameScene::Initialize() {
 	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
 	GenerateBlocks();
 
+	timer_ = timer;
+	timer_->SetScoreDisplayMode(Time::DisplayMode::Normal);
+
 	TextureManager::Load("lookOn.png");
 
 	// 自キャラの生成
@@ -56,6 +62,8 @@ void GameScene::Initialize() {
 	debugCamera_ = new DebugCamera(1280, 720);
 
 	imGuiManager = ImGuiManager::GetInstance();
+
+	target_ = kMaxTarget_;
 	
 }
 
@@ -168,9 +176,17 @@ void GameScene::Update()
 
 	case GameScene::Phase::kPlay:
 		CheckAllCollisions();
-		if (KamataEngine::Input::GetInstance()->PushKey(DIK_R))
+		if (isCountTimer_) 
 		{
-			finished_ = true;
+			timer_->Update();
+		}
+		player_->Update();
+		lookOn_->Update();
+		if (target_<= 0)
+		{
+			phase_ = Phase::kFadeOut;
+			isCountTimer_ = false;
+			timer_->TimerKeep();
 		}
 		
 		break;
@@ -184,19 +200,25 @@ void GameScene::Update()
 		break;
 	case GameScene::Phase::kFadeOut:
 		fade_->Update();
-		if (fade_->IsFinished()) {
+		if (fade_->IsFinished()) 
+		{
 			finished_ =  true;
+			
+			timer_->FileWrite();
 		}
 		break;
 
 	}
-
-	player_->Update();
-	lookOn_->Update();
+	
 	skydome_->Update();
 	for (Enemy* enemy : enemies_) 
 	{
 		enemy->Update();
+		if (enemy->IsDead())
+		{
+			target_ -= 1;
+			break;
+		}
 	}
 	cameraController_->Update();
 
@@ -266,6 +288,7 @@ void GameScene::Draw()
 	Sprite::PreDraw(dxCommon->GetCommandList());
 
 	lookOn_->DrawUI();
+	timer_->Draw();
 
 	Sprite::PostDraw();
 

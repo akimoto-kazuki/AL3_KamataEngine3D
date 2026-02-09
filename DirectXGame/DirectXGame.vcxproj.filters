@@ -34,12 +34,6 @@
     <Filter Include="ソース ファイル\Scene">
       <UniqueIdentifier>{20468457-2470-4095-94f0-da41bd3a6754}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ソース ファイル\Bullet">
-      <UniqueIdentifier>{e5ceba5c-7706-4b62-b44f-2afe4702c29a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ヘッダー ファイル\Bullet">
-      <UniqueIdentifier>{f7b04c35-ebfd-4d8a-9bb2-77fa1c729cd3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ソース ファイル\Others">
       <UniqueIdentifier>{62385211-28a8-4f64-8451-729ee14f09a7}</UniqueIdentifier>
     </Filter>
@@ -69,9 +63,6 @@
     <ClCompile Include="LookOn.cpp">
       <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerBullet.cpp">
-      <Filter>ソース ファイル\Bullet</Filter>
-    </ClCompile>
     <ClCompile Include="MyMath.cpp">
       <Filter>ソース ファイル\Others</Filter>
     </ClCompile>
@@ -97,6 +88,12 @@
       <Filter>ソース ファイル\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Time.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerBullet.cpp">
+      <Filter>ソース ファイル\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="BGMSet.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -168,9 +165,6 @@
     <ClInclude Include="LookOn.h">
       <Filter>ヘッダー ファイル\Player</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerBullet.h">
-      <Filter>ヘッダー ファイル\Bullet</Filter>
-    </ClInclude>
     <ClInclude Include="CameraController.h">
       <Filter>ヘッダー ファイル\Others</Filter>
     </ClInclude>
@@ -196,6 +190,12 @@
       <Filter>ヘッダー ファイル\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Time.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerBullet.h">
+      <Filter>ヘッダー ファイル\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="BGMSet.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

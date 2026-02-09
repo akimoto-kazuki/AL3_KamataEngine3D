@@ -1,7 +1,5 @@
 #pragma once
 #include "KamataEngine.h"
-#include "Player.h"
-#include "Enemy.h"
 #include "Skydome.h"
 #include "MapChipField.h"
 #include "CameraController.h"
@@ -10,7 +8,9 @@
 #include <time.h>
 #include "LookOn.h"
 
-
+class Player;
+class Enemy;
+class Time;
 class GameScene 
 {
 
@@ -24,7 +24,8 @@ class GameScene
 public:
 
 	// 初期化
-	void Initialize();
+	void Initialize(Time* timer);
+	// デストラクタ
 	~GameScene();
 	// 更新
 	void Update();
@@ -56,6 +57,14 @@ private:
 
 	Phase phase_;
 
+	Player* player_ = nullptr;
+	Time* timer_ = nullptr;
+	CameraController* cameraController_ = nullptr;
+	Skydome* skydome_ = nullptr;
+	LookOn* lookOn_ = nullptr;
+	MapChipField* mapChipField_;
+	std::list<Enemy*> enemies_;
+
 	// Model
 	KamataEngine::Model* model_ = nullptr;
 	KamataEngine::Model* modelSkydome_ = nullptr;
@@ -63,24 +72,13 @@ private:
 	KamataEngine::Model* modelShot_ = nullptr;
 	KamataEngine::Model* modelEnemy_ = nullptr;
 
-
 	KamataEngine::Camera camera_;
 
-	CameraController*cameraController_ = nullptr;
 
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 
-	Player* player_ = nullptr;
-
-	std::list<Enemy*> enemies_;
-
 	int enemySpoon = 25;
 
-	Skydome* skydome_ = nullptr;
-
-	LookOn* lookOn_ = nullptr;
-
-	MapChipField* mapChipField_;
 	void GenerateBlocks();
 
 	uint32_t textureHandle_ = 0;
@@ -89,5 +87,10 @@ private:
 	bool isDebugCameraActive_ = false;
 
 	ImGuiManager* imGuiManager = nullptr;
+
+	bool isCountTimer_ = true;
+
+	int target_; // 的の数
+	const int kMaxTarget_ = 4; // 的の最大数
 
 };

@@ -4,7 +4,8 @@
 #include "TitleScene.h"
 #include "Tutorial.h"
 #include "Clear.h"
-#include "Over.h"
+#include "Time.h"
+#include "BGMSet.h"
 
 using namespace KamataEngine;
 
@@ -15,8 +16,6 @@ enum class Scene {
 	kTutorial,
 	kGame,
 	kClear,
-	kOver,
-
 };
 
 Scene scene = Scene::kUnknown;
@@ -25,7 +24,12 @@ GameScene* gameScene = nullptr;
 TitleScene* titleScene = nullptr;
 Tutorial* tutorialScene = nullptr;
 Clear* clearScene = nullptr;
-Over* overScene = nullptr;
+Time* timer_ = nullptr;
+BGMSet* bgm_ = nullptr;
+
+uint32_t gameClearBgmHandle_;
+uint32_t gamePlayBgmHandle_ ;
+uint32_t titleBgmHandle_ ;
 
 void ChangeScene();
 
@@ -38,17 +42,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 	//エンジンの初期化
-	KamataEngine::Initialize(L"LE2C_02_アキモト_カズキ_小さな部屋～敵を回避しろ～");
+	KamataEngine::Initialize(L"LE2C_02_アキモト_カズキ_ターゲットを撃ち落とせ");
 
 	scene = Scene::kTitle;
 	titleScene = new TitleScene;
 	titleScene->Initialize();
-	//GameSceneの初期化
-	//ゲームシーンの解放
-	
-	// nullptrの代入
-	//gameScene = nullptr;
+	timer_ = new Time;
+	bgm_ = new BGMSet();
+	bgm_->Initialize();
 
+	titleBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/title.mp3");
+	gamePlayBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/gamePlay.mp3");
+	gameClearBgmHandle_ = Audio::GetInstance()->LoadWave("./BGM/gameClear.mp3");
+	
 	//メインループ
 	while (true) 
 	{
@@ -77,7 +83,6 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	delete gameScene;
 	delete tutorialScene;
 	delete clearScene;
-	delete overScene;
 
 	//エンジンの終了処理
 	KamataEngine::Finalize();
@@ -90,68 +95,57 @@ void ChangeScene()
 	switch (scene) 
 	{
 	case Scene::kTitle:
+		if (!bgm_->IsPlaying()) 
+		{
+			bgm_->BGMPlay(titleBgmHandle_);
+		}
 		if (titleScene->IsFinished()) 
 		{
-			scene = Scene::kGame;
+			scene = Scene::kTutorial;
 			delete titleScene;
 			titleScene = nullptr;
-			gameScene = new GameScene;
-			gameScene->Initialize();
-
-			//scene = Scene::kTutorial;
-			//delete titleScene;
-			//titleScene = nullptr;
-			//tutorialScene = new Tutorial;
-			//tutorialScene->Initialize();
+			tutorialScene = new Tutorial;
+			tutorialScene->Initialize();
 		}
 		break;
 	case Scene::kTutorial:
 		if (tutorialScene->IsFinished()) 
 		{
+			bgm_->BGMStop();
 			scene = Scene::kGame;
+			timer_->Initialize();
 			delete tutorialScene;
 			tutorialScene = nullptr;
 			gameScene = new GameScene;
-			gameScene->Initialize();
+			gameScene->Initialize(timer_);
 		}
 		break;
 	case Scene::kGame:
+		if (!bgm_->IsPlaying()) {
+			bgm_->BGMPlay(gamePlayBgmHandle_);
+		}
 		if (gameScene->IsFinished())
 		{
-			if (gameScene->IsClear())
-			{
-				scene = Scene::kClear;
-				clearScene = new Clear;
-				clearScene->Initialize();
-			} 
-			else
-			{
-				scene = Scene::kOver;
-				overScene = new Over;
-				overScene->Initialize();
-			}
-			
+			bgm_->BGMStop();
+			scene = Scene::kClear;
 			delete gameScene;
-			gameScene = nullptr;
+			gameScene = nullptr;	
+			clearScene = new Clear;
+			clearScene->Initialize();
 			
 		}
 		break;
 	case Scene::kClear:
+		if (!bgm_->IsPlaying()) 
+		{
+			bgm_->BGMPlay(gameClearBgmHandle_);
+		}
 		if (clearScene->IsFinished())
 		{
+			bgm_->BGMStop();
 			scene = Scene::kTitle;
 			delete clearScene;
 			clearScene = nullptr;
-			titleScene = new TitleScene;
-			titleScene->Initialize();
-		}
-		break;
-	case Scene::kOver:
-		if (overScene->IsFinished()) 
-		{
-			scene = Scene::kTitle;
-			delete overScene;
-			overScene = nullptr;
 			titleScene = new TitleScene;
 			titleScene->Initialize();
 		}
@@ -175,9 +169,6 @@ void UpdateScene()
 	case Scene::kClear:
 		clearScene->Update();
 		break;
-	case Scene::kOver:
-		overScene->Update();
-		break;
 	}
 }
 
@@ -196,9 +187,6 @@ void DrawScene()
 		break;
 	case Scene::kClear:
 		clearScene->Draw();
-		break;
-	case Scene::kOver:
-		overScene->Draw();
 		break;
 	}
 }

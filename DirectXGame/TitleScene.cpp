@@ -7,7 +7,8 @@ using namespace KamataEngine;
 void TitleScene::Initialize() 
 { 
 	model_ = Model::CreateFromOBJ("titleFont",true);
-	modelPlayer_ = Model::CreateFromOBJ("player",true);
+	modelPlayer_ = Model::CreateFromOBJ("titleSpace",true);
+	modelSkydome_ = Model::CreateFromOBJ("skydome", true);
 
 	camera_.Initialize();
 
@@ -16,12 +17,15 @@ void TitleScene::Initialize()
 	worldTransform_.translation_ = {0, 8, 0};
 
 	worldTransformPlayer_.Initialize();
-	worldTransformPlayer_.scale_ = {10, 10, 10};
-	worldTransformPlayer_.translation_ = {0, -8, 0};
-	worldTransformPlayer_.rotation_.y = std::numbers::pi_v<float>;
+	worldTransformPlayer_.scale_ = {5, 5, 5};
+	worldTransformPlayer_.translation_ = {0, -5, 0};
 
 	fade_ = new Fade();
 	fade_->Initialize();
+
+	skydome_ = new Skydome();
+	skydome_->Initialize(modelSkydome_, &camera_);
+
 
 	fade_->Start(Fade::Status::FadeIn, 1.0f);
 
@@ -36,9 +40,9 @@ TitleScene::~TitleScene()
 
 void TitleScene::Update()
 {
-
-	switch (phase_) {
-	
+	skydome_->Update();
+	switch (phase_) 
+	{
 	case TitleScene::Phase::kMain:
 		if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE))
 		{
@@ -59,23 +63,11 @@ void TitleScene::Update()
 			finished_ = true;
 		}
 		break;
-	
 	}
-
 	worldTransform_.matWorld_ = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.TransferMatrix();
-	
-	rotate += 0.1f;
-	worldTransformPlayer_.rotation_.y = sin(rotate) + std::numbers::pi_v<float>;
 	worldTransformPlayer_.matWorld_ = MakeAffineMatrix(worldTransformPlayer_.scale_, worldTransformPlayer_.rotation_, worldTransformPlayer_.translation_);
 	worldTransformPlayer_.TransferMatrix();
-
-	/*if (KamataEngine::Input::GetInstance()->PushKey(DIK_SPACE)) 
-	{
-		finished_ = true;
-	}
-
-	fade_->Update();*/
 }
 
 void TitleScene::Draw() 
@@ -83,7 +75,7 @@ void TitleScene::Draw()
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance(); 
 
 	Model::PreDraw(dxCommon->GetCommandList());
-
+	skydome_->Draw();
 	model_->Draw(worldTransform_, camera_);
 	modelPlayer_->Draw(worldTransformPlayer_, camera_);
 
