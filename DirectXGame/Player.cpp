@@ -455,8 +455,6 @@ void Player::CheckMapLanding(const CollisionMapInfo& info)
 	}
 	else 
 	{
-		// 空中状態
-		
 		// 着地フラグ
 		if (info.landing)
 		{
